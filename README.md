@@ -34,6 +34,30 @@
 #### data_pipeline
 在协程中不断读取RingBuffer的数据
 
+#### dh
+生成密钥和公钥，根据密钥公钥生成key
+
+#### encode
+[]byte 和 interface{} 互转
+
+#### fifo
+先进先出的数据结构
+
+#### file
+和文件相关的操作
+
+#### hash
+通过字符串生成32位数字
+
+#### ip
+获取ip
+
+#### json
+格式转换
+
+#### md5
+md5加密
+
 #### ring_buffer
 封装了一个RingBuffer，从pool中获取实例，进行各种操作
 
