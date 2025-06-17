@@ -58,8 +58,23 @@
 #### md5
 md5加密
 
+#### prase
+类型转换
+
+#### rate
+分布式速率限制器。实现了内存防抖，gc。
+
 #### ring_buffer
 封装了一个RingBuffer，从pool中获取实例，进行各种操作
+
+#### time
+时间格式的转换
+
+#### uuid
+生成uuid
+
+#### wai_group
+对sync.WaitGroup的封装
 
 ### pool
 
