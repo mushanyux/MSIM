@@ -2,13 +2,26 @@
 
 ## pkg
 
+### mshttp
+
+
 ### mslog
 封装zap等输出日志
 
 ### msnet
 
+#### http
+主要是对gin的封装和pool管理
+
+#### logger
+根据logger返回调用函数
+
 #### io
 封装readv，writev
+
+#### netpoll
+const: pollevent的定义
+基于epoll、kqueue、sys_epoll的epoll_event的调用，处理
 
 ### msutil
 在 MSChatServerLib 库基础上增加

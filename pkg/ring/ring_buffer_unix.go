@@ -18,7 +18,7 @@
 package ring
 
 import (
-	"github.com/mushanyux/MSIM/pkg/wknet/io"
+	"github.com/mushanyux/MSIM/pkg/msnet/io"
 	"golang.org/x/sys/unix"
 )
 
