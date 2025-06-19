@@ -5,9 +5,13 @@ go 1.23.0
 toolchain go1.23.3
 
 require (
+	github.com/RussellLuo/timingwheel v0.0.0-20220218152713-54845bda3108
 	github.com/gin-gonic/gin v1.10.1
+	github.com/gobwas/ws v1.4.0
 	github.com/google/uuid v1.6.0
+	github.com/mushanyux/crypto v0.0.0-20250619062110-a68040e32c1d
 	github.com/panjf2000/gnet/v2 v2.9.0
+	github.com/sasha-s/go-deadlock v0.3.5
 	github.com/sendgrid/rest v2.6.9+incompatible
 	github.com/valyala/bytebufferpool v1.0.0
 	go.uber.org/atomic v1.11.0
@@ -27,6 +31,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
@@ -35,6 +41,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
+	github.com/petermattis/goid v0.0.0-20240813172612-4fcff4a6cae7 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

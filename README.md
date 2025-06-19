@@ -2,19 +2,22 @@
 
 ## pkg
 
+### errors
+错误集合
+
 ### mshttp
 
+#### http
+主要是对gin的封装和用pool管理
+
+#### logger
+根据logger返回调用函数
 
 ### mslog
 封装zap等输出日志
 
 ### msnet
-
-#### http
-主要是对gin的封装和pool管理
-
-#### logger
-根据logger返回调用函数
+包含acceptor，自定义buffer，connect，event，listener等，还有engine之类的对于开源库的封装。同时对windows和linux类系统都做了支持
 
 #### io
 封装readv，writev
@@ -22,6 +25,10 @@
 #### netpoll
 const: pollevent的定义
 基于epoll、kqueue、sys_epoll的epoll_event的调用，处理
+
+#### socket
+对不同系统以及不同协议的socket进行封装
+
 
 ### msutil
 在 MSChatServerLib 库基础上增加
