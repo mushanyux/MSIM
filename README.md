@@ -5,6 +5,19 @@
 ### errors
 错误集合
 
+
+### keylock
+管理锁
+
+
+### mqtt
+mqtt协议响应码定义和接口定义
+
+
+### msdb
+数据库管理，表定义
+
+
 ### mshttp
 
 #### http
@@ -13,8 +26,10 @@
 #### logger
 根据logger返回调用函数
 
+
 ### mslog
 封装zap等输出日志
+
 
 ### msnet
 包含acceptor，自定义buffer，connect，event，listener等，还有engine之类的对于开源库的封装。同时对windows和linux类系统都做了支持
@@ -96,13 +111,20 @@ md5加密
 #### wai_group
 对sync.WaitGroup的封装
 
+
+### network
+get等请求的封装
+
+
 ### pool
 
 #### ringbuffer
 对ring_buffer用池管理
 
+
 ### ring
 实现ring_buffer的相关函数，如peek, read, write
+
 
 ### trace
 封装了metric观察cluster，db 等值
