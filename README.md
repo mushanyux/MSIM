@@ -103,3 +103,6 @@ md5加密
 
 ### ring
 实现ring_buffer的相关函数，如peek, read, write
+
+### trace
+封装了metric观察cluster，db 等值

@@ -57,7 +57,7 @@ type IDBMetrics interface {
 	// ========== compact 压缩相关 ==========
 	// CompactTotalCountSet 压缩总次数
 	CompactTotalCountSet(shardId uint32, v int64)
-	// CompactDefaultCountSet （还没搞清楚😂）
+	// CompactDefaultCountSet
 	CompactDefaultCountSet(shardId uint32, v int64)
 	// CompactDeleteOnlyCountSet 删除次数
 	CompactDeleteOnlyCountSet(shardId uint32, v int64)
