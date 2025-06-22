@@ -42,7 +42,7 @@ type mushanDB struct {
 	h hash.Hash32
 }
 
-func NewmushanDB(opts *Options) DB {
+func NewMushanDB(opts *Options) DB {
 	prmaryKeyGen, err := snowflake.NewNode(int64(opts.NodeId))
 	if err != nil {
 		panic(err)
