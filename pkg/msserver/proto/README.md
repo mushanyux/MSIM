@@ -1,0 +1,1 @@
+protoc ./pkg/msserver/proto/request.proto --go_out=./pkg/msserver/proto
