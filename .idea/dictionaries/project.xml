@@ -4,6 +4,7 @@
       <w>mshttp</w>
       <w>mslog</w>
       <w>msnet</w>
+      <w>msproto</w>
     </words>
   </dictionary>
 </component>

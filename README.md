@@ -2,6 +2,18 @@
 
 ## pkg
 
+### auth
+鉴权
+
+
+### bytequeue
+字节队列，类似缓冲区读取
+
+
+### client
+sdk，提供给外部使用
+
+
 ### cluster
 
 #### node
@@ -22,6 +34,22 @@
 
 ### errors
 错误集合
+
+
+### fasthash
+简单但快速的哈希
+
+
+### fasttime
+快速获取时间
+
+
+### grpcpool
+grpc池
+
+
+### jsonrpc
+基于json-rpc 2.0 规范的协议格式
 
 
 ### keylock
@@ -62,6 +90,9 @@ const: pollevent的定义
 #### socket
 对不同系统以及不同协议的socket进行封装
 
+
+### msserver
+基于 gnet 框架提供了高性能的网络通信服务，支持连接管理，消息路由等操作
 
 ### msutil
 在 MSChatServerLib 库基础上增加
@@ -140,9 +171,21 @@ get等请求的封装
 对ring_buffer用池管理
 
 
+### raft
+raft算法
+
+
 ### ring
 实现ring_buffer的相关函数，如peek, read, write
 
 
+### ringlock
+环形哈希锁
+
+
 ### trace
 封装了metric观察cluster，db 等值
+
+
+### wait
+等待器，可以注册和触发
