@@ -171,6 +171,14 @@ get等请求的封装
 对ring_buffer用池管理
 
 
+### promtail
+封装了一个 promtail 客户端将日志转发到loki
+
+
+### pse
+进程资源监控
+
+
 ### raft
 raft算法
 
