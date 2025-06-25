@@ -1,5 +1,12 @@
 # MSIM
 
+## internal
+
+`api` 提供http接口
+
+`server` 服务启动入口
+
+
 ## pkg
 
 ### auth
