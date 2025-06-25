@@ -104,7 +104,6 @@ func (ap AddressFamilyAndProtocol) IsUnspec() bool {
 
 // 是否是代理协议
 func isProxyProto(buff []byte) bool {
-
 	b1 := buff[:1]
 	if bytes.Equal(b1[:1], SIGV1[:1]) || bytes.Equal(b1[:1], SIGV2[:1]) {
 		return true
@@ -114,7 +113,6 @@ func isProxyProto(buff []byte) bool {
 
 // 解析代理协议 如果是代理协议则解析出真实的地址（如果通过反向代理并开启了代理协议，需要从代理协议里获取到连接的真实ip）
 func parseProxyProto(buff []byte) (remoteAddr net.Addr, size int, err error) {
-
 	dataLen := len(buff)
 
 	if dataLen <= 5 {
@@ -238,7 +236,6 @@ func parseV1PortNumber(portStr string) (int, error) {
 }
 
 func parseProxyProtoV2(buff []byte) (remoteAddr net.Addr, size int, err error) {
-
 	decoder := msproto.NewDecoder(buff)
 
 	// Skip first 12 bytes (signature)

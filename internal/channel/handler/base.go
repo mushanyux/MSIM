@@ -1,0 +1,130 @@
+package handler
+
+import (
+	"context"
+
+	"github.com/mushanyux/MSIM/internal/common"
+	"github.com/mushanyux/MSIM/internal/eventbus"
+	"github.com/mushanyux/MSIM/internal/ingress"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msserver/proto"
+	"go.uber.org/zap"
+)
+
+type Handler struct {
+	mslog.Log
+	client        *ingress.Client
+	commonService *common.Service
+}
+
+func NewHandler() *Handler {
+	h := &Handler{
+		Log:           mslog.NewMSLog("handler"),
+		client:        ingress.NewClient(),
+		commonService: common.NewService(),
+	}
+	h.routes()
+	return h
+}
+
+func (h *Handler) routes() {
+
+	// 发送消息
+	eventbus.RegisterChannelHandlers(eventbus.EventChannelOnSend, h.onSend)
+	// webhook
+	eventbus.RegisterChannelHandlers(eventbus.EventChannelWebhook, h.webhook)
+	// 分发消息
+	eventbus.RegisterChannelHandlers(eventbus.EventChannelDistribute, h.distribute)
+
+	eventbus.RegisterChannelHandlers(eventbus.EventChannelOnStream, h.onStream)
+
+}
+
+// 收到消息
+func (h *Handler) OnMessage(m *proto.Message) {
+	switch msgType(m.MsgType) {
+	case msgForwardChannelEvent:
+		h.onForwardChannelEvent(m)
+	}
+}
+
+// 收到事件
+func (h *Handler) OnEvent(ctx *eventbus.ChannelContext) {
+	if options.G.IsLocalNode(ctx.LeaderId) || h.notForwardToLeader(ctx.EventType) {
+		// 执行本地事件
+		eventbus.ExecuteChannelEvent(ctx)
+	} else {
+		if ctx.LeaderId != 0 {
+			// 转发到leader节点
+			h.forwardsToNode(ctx.LeaderId, ctx.ChannelId, ctx.ChannelType, ctx.Events)
+		} else {
+			h.Error("channel: OnEvent: leaderId is 0", zap.String("channelId", ctx.ChannelId), zap.Uint8("channelType", ctx.ChannelType))
+		}
+	}
+}
+
+// 不需要转发给领导的事件
+func (h *Handler) notForwardToLeader(eventType eventbus.EventType) bool {
+	switch eventType {
+	case eventbus.EventChannelWebhook,
+		eventbus.EventChannelDistribute:
+		return true
+	}
+	return false
+
+}
+
+func (h *Handler) forwardsToNode(nodeId uint64, channelId string, channelType uint8, events []*eventbus.Event) {
+	req := &forwardChannelEventReq{
+		channelId:   channelId,
+		channelType: channelType,
+		fromNode:    options.G.Cluster.NodeId,
+		events:      events,
+	}
+	data, err := req.encode()
+	if err != nil {
+		h.Error("forwardToLeader: encode failed", zap.Error(err))
+		return
+	}
+	msg := &proto.Message{
+		MsgType: uint32(msgForwardChannelEvent),
+		Content: data,
+	}
+	err = h.sendToNode(nodeId, msg)
+	if err != nil {
+		h.Error("channel: forwardToLeader: send failed", zap.Error(err), zap.Uint64("nodeId", nodeId), zap.String("channelId", channelId), zap.Uint8("channelType", channelType))
+		return
+	}
+}
+
+// func (h *Handler) forwardToNode(nodeId uint64, channelId string, channelType uint8, event *eventbus.Event) {
+// 	h.forwardsToNode(nodeId, channelId, channelType, []*eventbus.Event{event})
+// }
+
+func (h *Handler) sendToNode(toNodeId uint64, msg *proto.Message) error {
+	err := service.Cluster.Send(toNodeId, msg)
+	return err
+}
+
+// 收到转发用户事件
+func (h *Handler) onForwardChannelEvent(m *proto.Message) {
+	req := &forwardChannelEventReq{}
+	err := req.decode(m.Content)
+	if err != nil {
+		h.Error("onForwardChannelEvent: decode failed", zap.Error(err))
+		return
+	}
+
+	for _, e := range req.events {
+		eventbus.Channel.AddEvent(req.channelId, req.channelType, e)
+	}
+	eventbus.Channel.Advance(req.channelId, req.channelType)
+
+}
+
+func (h *Handler) WithTimeout() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), options.G.Channel.ProcessTimeout)
+
+}

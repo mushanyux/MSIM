@@ -101,8 +101,7 @@ func (s *Server) handleAuthenticatedConn(conn msnet.Conn, connCtx *eventbus.Conn
 			frames = append(frames, frame)
 			reqIds = append(reqIds, reqId)
 		}
-		offset += (len(buff) - reader.Len())
-
+		offset += len(buff) - reader.Len()
 	} else {
 		for len(buff) > offset {
 			frameData, _ := unpacket(buff[offset:])

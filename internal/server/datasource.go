@@ -30,7 +30,6 @@ type Datasource struct {
 
 // NewDatasource 创建一个数据源
 func NewDatasource(s *Server) IDatasource {
-
 	return &Datasource{
 		s: s,
 	}
@@ -53,12 +52,10 @@ func (d *Datasource) GetChannelInfo(channelID string, channelType uint8) (msdb.C
 	channelInfo.ChannelId = channelID
 	channelInfo.ChannelType = channelType
 	return msdb.EmptyChannelInfo, nil
-
 }
 
 // GetSubscribers 获取频道的订阅者
 func (d *Datasource) GetSubscribers(channelID string, channelType uint8) ([]string, error) {
-
 	result, err := d.requestCMD("getSubscribers", map[string]interface{}{
 		"channel_id":   channelID,
 		"channel_type": channelType,
@@ -76,7 +73,6 @@ func (d *Datasource) GetSubscribers(channelID string, channelType uint8) ([]stri
 
 // GetBlacklist 获取频道的黑名单
 func (d *Datasource) GetBlacklist(channelID string, channelType uint8) ([]string, error) {
-
 	result, err := d.requestCMD("getBlacklist", map[string]interface{}{
 		"channel_id":   channelID,
 		"channel_type": channelType,
@@ -95,7 +91,6 @@ func (d *Datasource) GetBlacklist(channelID string, channelType uint8) ([]string
 
 // GetWhitelist 获取频道的白明单
 func (d *Datasource) GetWhitelist(channelID string, channelType uint8) ([]string, error) {
-
 	result, err := d.requestCMD("getWhitelist", map[string]interface{}{
 		"channel_id":   channelID,
 		"channel_type": channelType,
