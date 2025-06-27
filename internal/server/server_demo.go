@@ -25,7 +25,7 @@ type DemoServer struct {
 func NewDemoServer(s *Server) *DemoServer {
 	// r := mshttp.New()
 	log := mslog.NewMSLog("DemoServer")
-	r := mshttp.NewWithLogger(mshttp.LoggerWithWklog(log))
+	r := mshttp.NewWithLogger(mshttp.LoggerWithMslog(log))
 	r.Use(mshttp.CORSMiddleware())
 
 	ds := &DemoServer{

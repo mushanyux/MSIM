@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
-	"github.com/WuKongIM/wkrpc"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	msproto "github.com/mushanyux/MSIMGoProto"
+	"github.com/mushanyux/msrpc"
 	"github.com/sendgrid/rest"
 	"go.uber.org/zap"
 )
 
-func (a *rpc) conversationChannels(c *wkrpc.Context) {
+func (a *rpc) conversationChannels(c *msrpc.Context) {
 	req := &pluginproto.ConversationChannelReq{}
 	err := req.Unmarshal(c.Body())
 	if err != nil {
@@ -22,9 +22,9 @@ func (a *rpc) conversationChannels(c *wkrpc.Context) {
 		return
 	}
 
-	leaderInfo, err := service.Cluster.SlotLeaderOfChannel(req.Uid, wkproto.ChannelTypePerson) // 获取频道的领导节点
+	leaderInfo, err := service.Cluster.SlotLeaderOfChannel(req.Uid, msproto.ChannelTypePerson) // 获取频道的领导节点
 	if err != nil {
-		a.Error("获取频道所在节点失败！!", zap.Error(err), zap.String("channelID", req.Uid), zap.Uint8("channelType", wkproto.ChannelTypePerson))
+		a.Error("获取频道所在节点失败！!", zap.Error(err), zap.String("channelID", req.Uid), zap.Uint8("channelType", msproto.ChannelTypePerson))
 		c.WriteErr(err)
 		return
 	}
@@ -35,7 +35,7 @@ func (a *rpc) conversationChannels(c *wkrpc.Context) {
 	reqBodyMap := map[string]interface{}{
 		"uid": req.Uid,
 	}
-	reqBody := wkutil.ToJSON(reqBodyMap)
+	reqBody := msutil.ToJSON(reqBodyMap)
 	resp, err := a.post(forwardUrl, []byte(reqBody))
 	if err != nil {
 		a.Error("转发请求失败！", zap.Error(err))
@@ -44,7 +44,7 @@ func (a *rpc) conversationChannels(c *wkrpc.Context) {
 	}
 
 	var respBodyMaps []map[string]interface{}
-	err = wkutil.ReadJSONByByte([]byte(resp.Body), &respBodyMaps)
+	err = msutil.ReadJSONByByte([]byte(resp.Body), &respBodyMaps)
 	if err != nil {
 		a.Error("解析返回数据失败！", zap.Error(err))
 		c.WriteErr(err)

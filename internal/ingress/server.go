@@ -3,43 +3,43 @@ package ingress
 import (
 	"errors"
 
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/WuKongIM/pkg/wkserver"
-	"github.com/WuKongIM/WuKongIM/pkg/wkserver/proto"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msserver"
+	"github.com/mushanyux/MSIM/pkg/msserver/proto"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	msproto "github.com/mushanyux/MSIMGoProto"
 	"go.uber.org/zap"
 )
 
 type Ingress struct {
-	wklog.Log
+	mslog.Log
 }
 
 func New() *Ingress {
 
 	return &Ingress{
-		Log: wklog.NewWKLog("Ingress"),
+		Log: mslog.NewMSLog("Ingress"),
 	}
 }
 
 func (i *Ingress) SetRoutes() {
 	// 获取tag
-	service.Cluster.Route("/wk/ingress/getTag", i.handleGetTag)
+	service.Cluster.Route("/ms/ingress/getTag", i.handleGetTag)
 	// 判断接受者是否允许发送消息
-	service.Cluster.Route("/wk/ingress/allowSend", i.handleAllowSend)
+	service.Cluster.Route("/ms/ingress/allowSend", i.handleAllowSend)
 	// 更新tag
-	service.Cluster.Route("/wk/ingress/updateTag", i.handleUpdateTag)
+	service.Cluster.Route("/ms/ingress/updateTag", i.handleUpdateTag)
 	// 添加tag
-	service.Cluster.Route("/wk/ingress/addTag", i.handleAddTag)
+	service.Cluster.Route("/ms/ingress/addTag", i.handleAddTag)
 	// 获取订阅者
-	service.Cluster.Route("/wk/ingress/getSubscribers", i.handleGetSubscribers)
+	service.Cluster.Route("/ms/ingress/getSubscribers", i.handleGetSubscribers)
 	// 获取流
-	service.Cluster.Route("/wk/ingress/getStreams", i.handleGetStreams)
+	service.Cluster.Route("/ms/ingress/getStreams", i.handleGetStreams)
 
 }
 
-func (i *Ingress) handleGetTag(c *wkserver.Context) {
+func (i *Ingress) handleGetTag(c *msserver.Context) {
 	req := &TagReq{}
 	err := req.decode(c.Body())
 	if err != nil {
@@ -87,7 +87,7 @@ func (i *Ingress) handleGetTag(c *wkserver.Context) {
 	c.Write(data)
 }
 
-func (i *Ingress) handleAllowSend(ctx *wkserver.Context) {
+func (i *Ingress) handleAllowSend(ctx *msserver.Context) {
 	req := &AllowSendReq{}
 	err := req.decode(ctx.Body())
 	if err != nil {
@@ -103,14 +103,14 @@ func (i *Ingress) handleAllowSend(ctx *wkserver.Context) {
 		return
 	}
 
-	if reasonCode == wkproto.ReasonSuccess {
+	if reasonCode == msproto.ReasonSuccess {
 		ctx.WriteOk()
 		return
 	}
 	ctx.WriteErrorAndStatus(errors.New("not allow send"), proto.Status(reasonCode))
 }
 
-func (i *Ingress) handleUpdateTag(c *wkserver.Context) {
+func (i *Ingress) handleUpdateTag(c *msserver.Context) {
 	var req = &TagUpdateReq{}
 	err := req.Decode(c.Body())
 	if err != nil {
@@ -155,7 +155,7 @@ func (i *Ingress) handleUpdateTag(c *wkserver.Context) {
 				}
 			}
 			if req.ChannelTag {
-				newTagKey := wkutil.GenUUID()
+				newTagKey := msutil.GenUUID()
 				err = service.TagManager.RenameTag(tagKey, newTagKey)
 				if err != nil {
 					i.Warn("handleUpdateTag: rename tag failed", zap.Error(err))
@@ -168,7 +168,7 @@ func (i *Ingress) handleUpdateTag(c *wkserver.Context) {
 
 }
 
-func (i *Ingress) handleAddTag(c *wkserver.Context) {
+func (i *Ingress) handleAddTag(c *msserver.Context) {
 	req := &TagAddReq{}
 	err := req.Decode(c.Body())
 	if err != nil {
@@ -197,7 +197,7 @@ func (i *Ingress) handleAddTag(c *wkserver.Context) {
 	c.WriteOk()
 }
 
-func (i *Ingress) handleGetSubscribers(c *wkserver.Context) {
+func (i *Ingress) handleGetSubscribers(c *msserver.Context) {
 	req := &ChannelReq{}
 	err := req.Decode(c.Body())
 	if err != nil {
@@ -236,7 +236,7 @@ func (i *Ingress) handleGetSubscribers(c *wkserver.Context) {
 	c.Write(data)
 }
 
-func (i *Ingress) handleGetStreams(c *wkserver.Context) {
+func (i *Ingress) handleGetStreams(c *msserver.Context) {
 	req := &StreamReq{}
 	err := req.Decode(c.Body())
 	if err != nil {

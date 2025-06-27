@@ -7,12 +7,12 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/pkg/cluster/node/types"
-	"github.com/WuKongIM/WuKongIM/pkg/network"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/pkg/cluster/node/types"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	"github.com/mushanyux/MSIM/pkg/network"
 	"go.uber.org/zap"
 )
 
@@ -20,7 +20,7 @@ import (
 type SystemAccountManager struct {
 	systemUIDs sync.Map
 	loaded     atomic.Bool
-	wklog.Log
+	mslog.Log
 }
 
 // SystemAccountManager SystemAccountManager
@@ -28,7 +28,7 @@ func NewSystemAccountManager() *SystemAccountManager {
 
 	return &SystemAccountManager{
 		systemUIDs: sync.Map{},
-		Log:        wklog.NewWKLog("SystemUIDManager"),
+		Log:        mslog.NewMSLog("SystemUIDManager"),
 	}
 }
 
@@ -143,7 +143,7 @@ func (s *SystemAccountManager) requestSystemUids(nodeInfo *types.Node) ([]string
 	}
 
 	var systemUIDs []string
-	err = wkutil.ReadJSONByByte([]byte(resp.Body), &systemUIDs)
+	err = msutil.ReadJSONByByte([]byte(resp.Body), &systemUIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (s *SystemAccountManager) getSystemUIDsFromDatasource() ([]string, error) {
 		return nil, err
 	}
 	var uids []string
-	err = wkutil.ReadJSONByByte([]byte(result), &uids)
+	err = msutil.ReadJSONByByte([]byte(result), &uids)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (s *SystemAccountManager) requestCMD(cmd string, param map[string]interface
 	if param != nil {
 		dataMap["data"] = param
 	}
-	resp, err := network.Post(options.G.Datasource.Addr, []byte(wkutil.ToJSON(dataMap)), nil)
+	resp, err := network.Post(options.G.Datasource.Addr, []byte(msutil.ToJSON(dataMap)), nil)
 	if err != nil {
 		return "", err
 	}

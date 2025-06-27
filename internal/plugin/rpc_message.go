@@ -6,18 +6,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/eventbus"
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/track"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
-	"github.com/WuKongIM/wkrpc"
+	"github.com/mushanyux/MSIM/internal/eventbus"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/track"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	msproto "github.com/mushanyux/MSIMGoProto"
+	"github.com/mushanyux/msrpc"
 	"go.uber.org/zap"
 )
 
-func (a *rpc) messageSend(c *wkrpc.Context) {
+func (a *rpc) messageSend(c *msrpc.Context) {
 	req := &pluginproto.SendReq{}
 	err := req.Unmarshal(c.Body())
 	if err != nil {
@@ -57,15 +57,15 @@ func (a *rpc) messageSend(c *wkrpc.Context) {
 
 	clientMsgNo := req.ClientMsgNo
 	if strings.TrimSpace(clientMsgNo) == "" {
-		clientMsgNo = fmt.Sprintf("%s0", wkutil.GenUUID())
+		clientMsgNo = fmt.Sprintf("%s0", msutil.GenUUID())
 	}
 	fakeChannelId := channelId
-	if channelType == wkproto.ChannelTypePerson {
+	if channelType == msproto.ChannelTypePerson {
 		fakeChannelId = options.GetFakeChannelIDWith(req.FromUid, channelId)
 	}
 
-	sendPacket := &wkproto.SendPacket{
-		Framer: wkproto.Framer{
+	sendPacket := &msproto.SendPacket{
+		Framer: msproto.Framer{
 			RedDot:    req.Header.RedDot,
 			SyncOnce:  req.Header.SyncOnce,
 			NoPersist: req.Header.NoPersist,
@@ -107,7 +107,7 @@ func (a *rpc) messageSend(c *wkrpc.Context) {
 	c.Write(data)
 }
 
-func (a *rpc) channelMessages(c *wkrpc.Context) {
+func (a *rpc) channelMessages(c *msrpc.Context) {
 	channelMessageBatchReq := &pluginproto.ChannelMessageBatchReq{}
 	err := channelMessageBatchReq.Unmarshal(c.Body())
 	if err != nil {

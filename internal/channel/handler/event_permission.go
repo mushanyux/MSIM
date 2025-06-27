@@ -14,7 +14,6 @@ import (
 
 // 权限判断
 func (h *Handler) permission(ctx *eventbus.ChannelContext) {
-
 	events := ctx.Events
 	channelId := ctx.ChannelId
 	channelType := ctx.ChannelType
@@ -53,7 +52,6 @@ func (h *Handler) permission(ctx *eventbus.ChannelContext) {
 
 // 先判断频道的权限
 func (h *Handler) hasPermissionForChannel(channelId string, channelType uint8) (msproto.ReasonCode, error) {
-
 	// 资讯频道是公开的，直接通过
 	if channelType == msproto.ChannelTypeInfo {
 		return msproto.ReasonSuccess, nil
@@ -62,14 +60,12 @@ func (h *Handler) hasPermissionForChannel(channelId string, channelType uint8) (
 	if channelType == msproto.ChannelTypeCustomerService {
 		return msproto.ReasonSuccess, nil
 	}
-
 	// 查询频道基本信息
 	channelInfo, err := service.Store.GetChannel(channelId, channelType)
 	if err != nil {
 		h.Error("hasPermission: GetChannel error", zap.Error(err))
 		return msproto.ReasonSystemError, err
 	}
-
 	// 频道被封禁
 	if channelInfo.Ban {
 		return msproto.ReasonBan, nil
@@ -87,11 +83,9 @@ func (h *Handler) hasPermissionForChannel(channelId string, channelType uint8) (
 
 // 判断发送者是否有权限
 func (h *Handler) hasPermissionForSender(channelId string, channelType uint8, e *eventbus.Event) (msproto.ReasonCode, error) {
-
 	var (
 		fromUid = e.Conn.Uid
 	)
-
 	// 资讯频道是公开的，直接通过
 	if channelType == msproto.ChannelTypeInfo {
 		return msproto.ReasonSuccess, nil
@@ -100,17 +94,14 @@ func (h *Handler) hasPermissionForSender(channelId string, channelType uint8, e 
 	if channelType == msproto.ChannelTypeCustomerService {
 		return msproto.ReasonSuccess, nil
 	}
-
 	// 系统发的消息直接通过
 	if options.G.IsSystemDevice(e.Conn.DeviceId) {
 		return msproto.ReasonSuccess, nil
 	}
-
 	// 系统账号，直接通过
 	if service.SystemAccountManager.IsSystemAccount(fromUid) {
 		return msproto.ReasonSuccess, nil
 	}
-
 	// 个人频道,需要判断接收者是否允许
 	if channelType == msproto.ChannelTypePerson {
 		return h.hasPermissionForPerson(channelId, channelType, e)
@@ -154,7 +145,6 @@ func (h *Handler) hasPermissionForCommChannel(channelId string, channelType uint
 			h.Error("HasAllowlist error", zap.Error(err))
 			return msproto.ReasonSystemError, err
 		}
-
 		if hasAllowlist { // 如果频道有白名单，则判断是否在白名单内
 			isAllowlist, err := service.Store.ExistAllowlist(realFakeChannelId, channelType, fromUid)
 			if err != nil {
@@ -200,7 +190,6 @@ func (h *Handler) hasPermissionForPerson(channelId string, _ uint8, e *eventbus.
 }
 
 func (h *Handler) requestAllowSend(from, to string) (msproto.ReasonCode, error) {
-
 	leaderNode, err := service.Cluster.SlotLeaderOfChannel(to, msproto.ChannelTypePerson)
 	if err != nil {
 		return msproto.ReasonSystemError, err
@@ -223,7 +212,6 @@ func (h *Handler) requestAllowSend(from, to string) (msproto.ReasonCode, error) 
 }
 
 func (h *Handler) allowSend(from, to string) (msproto.ReasonCode, error) {
-
 	// 查询接收者的频道信息
 	toChannelInfo, err := service.Store.GetChannel(to, msproto.ChannelTypePerson)
 	if err != nil {

@@ -5,28 +5,28 @@ import (
 	"sync"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/errors"
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/types"
+	"github.com/mushanyux/MSIM/internal/errors"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/types"
 	"go.uber.org/zap"
 
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msutil"
 )
 
 type TagManager struct {
 	bluckets []*tagBlucket
 	// 获取当前节点版本号
 	nodeVersion func() uint64
-	wklog.Log
+	mslog.Log
 	sync.RWMutex
 }
 
 func NewTagManager(blucketCount int, nodeVersion func() uint64) *TagManager {
 	tg := &TagManager{
 		nodeVersion: nodeVersion,
-		Log:         wklog.NewWKLog("TagManager"),
+		Log:         mslog.NewMSLog("TagManager"),
 	}
 	tg.bluckets = make([]*tagBlucket, blucketCount)
 	for i := 0; i < blucketCount; i++ {
@@ -52,12 +52,11 @@ func (t *TagManager) Stop() {
 }
 
 func (t *TagManager) MakeTag(uids []string) (*types.Tag, error) {
-	tagKey := wkutil.GenUUID()
+	tagKey := msutil.GenUUID()
 	return t.MakeTagWithTagKey(tagKey, uids)
 }
 
 func (t *TagManager) MakeTagWithTagKey(tagKey string, uids []string) (*types.Tag, error) {
-
 	tag, err := t.MakeTagNotCacheWithTagKey(tagKey, uids)
 	if err != nil {
 		return nil, err
@@ -244,7 +243,7 @@ func (t *TagManager) getBlucketByTagKey(tagKey string) *tagBlucket {
 
 func (t *TagManager) getBlucketByChannel(channelId string, channelType uint8) *tagBlucket {
 	h := fnv.New32a()
-	h.Write([]byte(wkutil.ChannelToKey(channelId, channelType)))
+	h.Write([]byte(msutil.ChannelToKey(channelId, channelType)))
 	i := h.Sum32() % uint32(len(t.bluckets))
 	return t.bluckets[i]
 }

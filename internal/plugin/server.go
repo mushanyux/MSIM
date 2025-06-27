@@ -14,21 +14,21 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/types"
 	"github.com/fsnotify/fsnotify"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/types"
 
-	"github.com/WuKongIM/WuKongIM/pkg/fasthash"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/wkrpc"
+	"github.com/mushanyux/MSIM/pkg/fasthash"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/msrpc"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	rpcServer     *wkrpc.Server
+	rpcServer     *msrpc.Server
 	pluginManager *pluginManager
 	rpc           *rpc
-	wklog.Log
+	mslog.Log
 	opts       *Options
 	sandboxDir string // 沙箱目录
 
@@ -42,7 +42,7 @@ func NewServer(opts *Options) *Server {
 	if err != nil {
 		panic(err)
 	}
-	rpcServer := wkrpc.New(addr)
+	rpcServer := msrpc.New(addr)
 
 	// 如果插件目录不存在则创建
 	if _, err := os.Stat(opts.Dir); os.IsNotExist(err) {
@@ -70,7 +70,7 @@ func NewServer(opts *Options) *Server {
 		rpcServer:     rpcServer,
 		opts:          opts,
 		pluginManager: newPluginManager(),
-		Log:           wklog.NewWKLog("plugin.server"),
+		Log:           mslog.NewMSLog("plugin.server"),
 		sandboxDir:    sandboxDir,
 		bucketSize:    10,
 	}
@@ -450,7 +450,7 @@ func (s *Server) watchPlugins() error {
 
 // 是否是插件扩展
 func isPluginExt(ext string) bool {
-	return ext == ".wkp"
+	return ext == ".msp"
 }
 
 func (s *Server) stopPlugins() error {

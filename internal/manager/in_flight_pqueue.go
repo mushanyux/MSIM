@@ -1,6 +1,6 @@
 package manager
 
-import "github.com/WuKongIM/WuKongIM/internal/types"
+import "github.com/mushanyux/MSIM/internal/types"
 
 type inFlightPqueue []*types.RetryMessage // 队列消息量大，这里直接使用具体类型，防止大量类型转换影响性能
 

@@ -146,20 +146,25 @@ type User struct {
 var EmptyChannelInfo = ChannelInfo{}
 
 type ChannelInfo struct {
-	Id              uint64     `json:"id,omitempty"`               // ID
-	ChannelId       string     `json:"channel_id,omitempty"`       // 频道ID
-	ChannelType     uint8      `json:"channel_type,omitempty"`     // 频道类型
-	Ban             bool       `json:"ban,omitempty"`              // 是否被封
-	Large           bool       `json:"large,omitempty"`            // 是否是超大群
-	Disband         bool       `json:"disband,omitempty"`          // 是否解散
-	SubscriberCount int        `json:"subscriber_count,omitempty"` // 订阅者数量
-	DenylistCount   int        `json:"denylist_count,omitempty"`   // 黑名单数量
-	AllowlistCount  int        `json:"allowlist_count,omitempty"`  // 白名单数量
-	LastMsgSeq      uint64     `json:"last_msg_seq,omitempty"`     // 最新消息序号
-	LastMsgTime     uint64     `json:"last_msg_time,omitempty"`    // 最后一次消息时间
-	Webhook         string     `json:"webhook,omitempty"`          // webhook地址
-	CreatedAt       *time.Time `json:"created_at,omitempty"`       // 创建时间
-	UpdatedAt       *time.Time `json:"updated_at,omitempty"`       // 更新时间
+	Id              uint64 `json:"id,omitempty"`               // ID
+	ChannelId       string `json:"channel_id,omitempty"`       // 频道ID
+	ChannelType     uint8  `json:"channel_type,omitempty"`     // 频道类型
+	Ban             bool   `json:"ban,omitempty"`              // 是否被封
+	Large           bool   `json:"large,omitempty"`            // 是否是超大群
+	Disband         bool   `json:"disband,omitempty"`          // 是否解散
+	SubscriberCount int    `json:"subscriber_count,omitempty"` // 订阅者数量
+	DenylistCount   int    `json:"denylist_count,omitempty"`   // 黑名单数量
+	AllowlistCount  int    `json:"allowlist_count,omitempty"`  // 白名单数量
+	LastMsgSeq      uint64 `json:"last_msg_seq,omitempty"`     // 最新消息序号
+	LastMsgTime     uint64 `json:"last_msg_time,omitempty"`    // 最后一次消息时间
+	Webhook         string `json:"webhook,omitempty"`          // webhook地址
+	// 是否禁止发送消息 （0.不禁止 1.禁止），禁止后，频道内所有成员都不能发送消息,个人频道能收消息，但不能发消息
+	SendBan bool `json:"send_ban,omitempty"`
+	// 是否允许陌生人发送消息（0.不允许 1.允许）（此配置目前只支持个人频道）
+	// 个人频道：如果AllowStranger为1，则陌生人可以给当前用户发消息
+	AllowStranger bool       `json:"allow_stranger,omitempty"`
+	CreatedAt     *time.Time `json:"created_at,omitempty"` // 创建时间
+	UpdatedAt     *time.Time `json:"updated_at,omitempty"` // 更新时间
 }
 
 func NewChannelInfo(channelId string, channelType uint8) ChannelInfo {

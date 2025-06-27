@@ -5,24 +5,24 @@ import (
 	"time"
 
 	"github.com/RussellLuo/timingwheel"
-	"github.com/WuKongIM/WuKongIM/internal/eventbus"
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
+	"github.com/mushanyux/MSIM/internal/eventbus"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	msproto "github.com/mushanyux/MSIMGoProto"
 	"go.uber.org/zap"
 )
 
 type RetryManager struct {
 	retryQueues []*RetryQueue
 	timingWheel *timingwheel.TimingWheel
-	wklog.Log
+	mslog.Log
 }
 
 func NewRetryManager() *RetryManager {
 	return &RetryManager{
 		retryQueues: make([]*RetryQueue, options.G.MessageRetry.WorkerCount),
-		Log:         wklog.NewWKLog("retryManager"),
+		Log:         mslog.NewMSLog("retryManager"),
 		timingWheel: timingwheel.NewTimingWheel(options.G.TimingWheelTick, options.G.TimingWheelSize),
 	}
 }
@@ -77,7 +77,7 @@ func (r *RetryManager) retry(msg *types.RetryMessage) {
 	msg.Retry++
 	if msg.Retry > options.G.MessageRetry.MaxCount {
 		r.Warn("exceeded the maximum number of retries", zap.String("uid", msg.Uid), zap.String("channelId", msg.ChannelId), zap.Uint8("channelType", msg.ChannelType), zap.Int64("messageId", msg.MessageId), zap.Int("messageMaxRetryCount", options.G.MessageRetry.MaxCount))
-		if options.G.Logger.TraceOn && msg.ChannelType == wkproto.ChannelTypePerson {
+		if options.G.Logger.TraceOn && msg.ChannelType == msproto.ChannelTypePerson {
 			r.Trace("超过最大重试次数，暂停重试", "retry", zap.String("uid", msg.Uid), zap.Int64("messageId", msg.MessageId), zap.Int64("connId", msg.ConnId), zap.Int("retryCount", msg.Retry), zap.Int("maxRetryCount", options.G.MessageRetry.MaxCount))
 		}
 		return
@@ -86,7 +86,7 @@ func (r *RetryManager) retry(msg *types.RetryMessage) {
 	if conn == nil {
 		r.Debug("conn offline", zap.String("uid", msg.Uid), zap.Int64("messageId", msg.MessageId), zap.Int64("connId", msg.ConnId))
 
-		if options.G.Logger.TraceOn && msg.ChannelType == wkproto.ChannelTypePerson {
+		if options.G.Logger.TraceOn && msg.ChannelType == msproto.ChannelTypePerson {
 			r.Trace("连接已经离线，暂停重试", "retry", zap.String("uid", msg.Uid), zap.Int64("messageId", msg.MessageId), zap.Int64("connId", msg.ConnId))
 			conns := eventbus.User.ConnsByUid(msg.Uid)
 			if len(conns) > 0 {
@@ -100,7 +100,7 @@ func (r *RetryManager) retry(msg *types.RetryMessage) {
 	// 添加到重试队列
 	r.AddRetry(msg)
 
-	if options.G.Logger.TraceOn && msg.ChannelType == wkproto.ChannelTypePerson {
+	if options.G.Logger.TraceOn && msg.ChannelType == msproto.ChannelTypePerson {
 		r.Trace("重试消息", "retry", zap.String("uid", msg.Uid), zap.Int64("messageId", msg.MessageId), zap.Int64("connId", msg.ConnId), zap.String("deviceId", conn.DeviceId), zap.String("deviceFlag", conn.DeviceFlag.String()), zap.Int("retryCount", msg.Retry), zap.Int("maxRetryCount", options.G.MessageRetry.MaxCount))
 	}
 

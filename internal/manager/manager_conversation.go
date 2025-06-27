@@ -8,16 +8,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/eventbus"
-	"github.com/WuKongIM/WuKongIM/internal/ingress"
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/pkg/fasthash"
-	"github.com/WuKongIM/WuKongIM/pkg/wkdb"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
 	"github.com/lni/goutils/syncutil"
+	"github.com/mushanyux/MSIM/internal/eventbus"
+	"github.com/mushanyux/MSIM/internal/ingress"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/pkg/fasthash"
+	"github.com/mushanyux/MSIM/pkg/msdb"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	msproto "github.com/mushanyux/MSIMGoProto"
 	"go.uber.org/zap"
 )
 
@@ -26,7 +26,7 @@ type ConversationManager struct {
 	updaterCount int
 	client       *ingress.Client
 	stopper      *syncutil.Stopper
-	wklog.Log
+	mslog.Log
 }
 
 func NewConversationManager(updaterCount int) *ConversationManager {
@@ -40,7 +40,7 @@ func NewConversationManager(updaterCount int) *ConversationManager {
 		updaterCount: updaterCount,
 		updaters:     updaters,
 		client:       client,
-		Log:          wklog.NewWKLog("ConversationManager"),
+		Log:          mslog.NewMSLog("ConversationManager"),
 		stopper:      syncutil.NewStopper(),
 	}
 }
@@ -50,7 +50,7 @@ func (c *ConversationManager) Push(fakeChannelId string, channelType uint8, tagK
 		return
 	}
 
-	if channelType == wkproto.ChannelTypeLive { // 直播频道不添加会话
+	if channelType == msproto.ChannelTypeLive { // 直播频道不添加会话
 		return
 	}
 
@@ -80,12 +80,12 @@ func (c *ConversationManager) Push(fakeChannelId string, channelType uint8, tagK
 	}
 
 	// 如果是个人频道并且开启了白名单，则不需要更新最近会话,因为在添加白名单的时候就已经添加了最近会话
-	if channelType == wkproto.ChannelTypePerson && !options.G.WhitelistOffOfPerson {
+	if channelType == msproto.ChannelTypePerson && !options.G.WhitelistOffOfPerson {
 		return
 	}
 
 	// 如果是客服频道或个人频道，则需要更新最近会话
-	if channelType == wkproto.ChannelTypeCustomerService || channelType == wkproto.ChannelTypePerson {
+	if channelType == msproto.ChannelTypeCustomerService || channelType == msproto.ChannelTypePerson {
 		if firstMsgSeq == 1 {
 			index := c.getUpdaterIndex(fakeChannelId)
 			c.updaters[index].push(fakeChannelId, channelType, tagKey, lastMsgSeq)
@@ -108,7 +108,7 @@ func (c *ConversationManager) Stop() {
 }
 
 func (c *ConversationManager) DeleteFromCache(uid string, channelId string, channelType uint8) error {
-	if channelType == wkproto.ChannelTypeLive { // 直播频道不删除会话
+	if channelType == msproto.ChannelTypeLive { // 直播频道不删除会话
 		return nil
 	}
 	index := c.getUpdaterIndex(channelId)
@@ -144,10 +144,10 @@ func (c *ConversationManager) saveToFile() {
 
 func (c *ConversationManager) loadFromFile() {
 	conversationPath := path.Join(options.G.DataDir, "conversationv2", "conversations.json")
-	if !wkutil.FileExists(conversationPath) {
+	if !msutil.FileExists(conversationPath) {
 		return
 	}
-	data, err := wkutil.ReadFile(conversationPath)
+	data, err := msutil.ReadFile(conversationPath)
 	if err != nil {
 		c.Error("load conversations from file failed", zap.Error(err))
 		return
@@ -176,8 +176,8 @@ func (c *ConversationManager) loadFromFile() {
 }
 
 // GetUserChannels 获取用户订阅的频道
-func (c *ConversationManager) GetUserChannelsFromCache(uid string, conversationType wkdb.ConversationType) ([]wkproto.Channel, error) {
-	var allChannels []wkproto.Channel
+func (c *ConversationManager) GetUserChannelsFromCache(uid string, conversationType msdb.ConversationType) ([]msproto.Channel, error) {
+	var allChannels []msproto.Channel
 	for _, updater := range c.updaters {
 		channels, err := updater.getUserChannels(uid, conversationType)
 		if err != nil {
@@ -202,20 +202,20 @@ func (c *ConversationManager) loopStoreConversations() {
 }
 
 func (c *ConversationManager) storeConversations() {
-	var conversations []wkdb.Conversation
+	var conversations []msdb.Conversation
 
 	// 每次存储数量
 	for _, updater := range c.updaters {
 		updates := updater.getChannelUpdates()
 		for _, update := range updates {
-			conversationType := wkdb.ConversationTypeChat
+			conversationType := msdb.ConversationTypeChat
 			if options.G.IsCmdChannel(update.ChannelId) {
-				conversationType = wkdb.ConversationTypeCMD
+				conversationType = msdb.ConversationTypeCMD
 			}
 			for _, uid := range update.Uids {
 				createdAt := time.Now()
 				updatedAt := time.Now()
-				conversations = append(conversations, wkdb.Conversation{
+				conversations = append(conversations, msdb.Conversation{
 					ChannelId:   update.ChannelId,
 					ChannelType: update.ChannelType,
 					Uid:         uid,
@@ -260,20 +260,20 @@ type conversationUpdater struct {
 	waitUpdates map[string]*channelUpdate // 等待更新的频道
 	sync.RWMutex
 	client *ingress.Client
-	wklog.Log
+	mslog.Log
 }
 
 func newConversationUpdater(client *ingress.Client) *conversationUpdater {
 	return &conversationUpdater{
 		waitUpdates: make(map[string]*channelUpdate),
 		client:      client,
-		Log:         wklog.NewWKLog("conversationUpdater"),
+		Log:         mslog.NewMSLog("conversationUpdater"),
 	}
 }
 
 func (c *conversationUpdater) push(fakeChannelId string, channelType uint8, tagKey string, lastMsgSeq uint64) {
 
-	key := wkutil.ChannelToKey(fakeChannelId, channelType)
+	key := msutil.ChannelToKey(fakeChannelId, channelType)
 	c.RLock()
 	update := c.waitUpdates[key]
 	c.RUnlock()
@@ -297,30 +297,30 @@ func (c *conversationUpdater) push(fakeChannelId string, channelType uint8, tagK
 }
 
 func (c *conversationUpdater) setChannelUpdate(fakeChannelId string, channelType uint8, tagKey string, uids []string, lastMsgSeq uint64) {
-	key := wkutil.ChannelToKey(fakeChannelId, channelType)
+	key := msutil.ChannelToKey(fakeChannelId, channelType)
 	c.Lock()
 	c.waitUpdates[key] = &channelUpdate{ChannelId: fakeChannelId, ChannelType: channelType, Uids: uids, TagKey: tagKey, LastMsgSeq: lastMsgSeq}
 	c.Unlock()
 }
 
 // 获取用户订阅的频道
-func (c *conversationUpdater) getUserChannels(uid string, conversationType wkdb.ConversationType) ([]wkproto.Channel, error) {
+func (c *conversationUpdater) getUserChannels(uid string, conversationType msdb.ConversationType) ([]msproto.Channel, error) {
 	c.RLock()
 	defer c.RUnlock()
-	var channels []wkproto.Channel
+	var channels []msproto.Channel
 	for _, channelUpdate := range c.waitUpdates {
 
 		isCMDChannel := options.G.IsCmdChannel(channelUpdate.ChannelId)
 
-		if isCMDChannel && conversationType != wkdb.ConversationTypeCMD {
+		if isCMDChannel && conversationType != msdb.ConversationTypeCMD {
 			continue
 		}
-		if !isCMDChannel && conversationType != wkdb.ConversationTypeChat {
+		if !isCMDChannel && conversationType != msdb.ConversationTypeChat {
 			continue
 		}
 
 		if slices.Contains(channelUpdate.Uids, uid) {
-			channels = append(channels, wkproto.Channel{
+			channels = append(channels, msproto.Channel{
 				ChannelID:   channelUpdate.ChannelId,
 				ChannelType: channelUpdate.ChannelType,
 			})
@@ -342,7 +342,7 @@ func (c *conversationUpdater) getChannelUpdates() []*channelUpdate {
 
 func (c *conversationUpdater) removeChannelUpdate(fakeChannelId string, channelType uint8) {
 	c.Lock()
-	delete(c.waitUpdates, wkutil.ChannelToKey(fakeChannelId, channelType))
+	delete(c.waitUpdates, msutil.ChannelToKey(fakeChannelId, channelType))
 	c.Unlock()
 }
 

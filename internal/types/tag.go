@@ -22,7 +22,6 @@ type Tag struct {
 }
 
 func (t *Tag) String() string {
-
 	return fmt.Sprintf("Tag{Key:%s, Nodes:%v, LastGetTime:%v}", t.Key, t.Nodes, t.LastGetTime)
 }
 

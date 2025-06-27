@@ -11,23 +11,23 @@ import (
 	"sync"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/WuKongIM/pkg/auth"
-	"github.com/WuKongIM/WuKongIM/pkg/auth/resource"
-	"github.com/WuKongIM/WuKongIM/pkg/network"
-	"github.com/WuKongIM/WuKongIM/pkg/wkdb"
-	"github.com/WuKongIM/WuKongIM/pkg/wkhttp"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
 	"github.com/gin-gonic/gin"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/MSIM/pkg/auth"
+	"github.com/mushanyux/MSIM/pkg/auth/resource"
+	"github.com/mushanyux/MSIM/pkg/msdb"
+	"github.com/mushanyux/MSIM/pkg/mshttp"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	"github.com/mushanyux/MSIM/pkg/network"
+	msproto "github.com/mushanyux/MSIMGoProto"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
 
-func (s *Server) SetRoute(r *wkhttp.WKHttp) {
+func (s *Server) SetRoute(r *mshttp.MSHttp) {
 
 	r.Any("/plugins/:plugin/*path", s.handlePluginRoute) // 处理插件的路由，将http请求转发给插件
 
@@ -42,10 +42,10 @@ func (s *Server) SetRoute(r *wkhttp.WKHttp) {
 
 // 获取插件列表
 
-func (s *Server) handleGetPlugins(c *wkhttp.Context) {
+func (s *Server) handleGetPlugins(c *mshttp.Context) {
 
 	typeStr := c.Query("type") // 插件类型 ai: 机器人插件
-	nodeId := wkutil.ParseUint64(c.Query("node_id"))
+	nodeId := msutil.ParseUint64(c.Query("node_id"))
 
 	if nodeId == 0 {
 		nodeId = options.G.Cluster.NodeId
@@ -74,12 +74,12 @@ func (s *Server) handleGetPlugins(c *wkhttp.Context) {
 	for _, p := range plugins {
 		// 如果是机器人插件，只返回有Receive方法的插件
 		if typeStr != "" && strings.ToLower(typeStr) == "ai" {
-			if len(p.Methods) == 0 || !wkutil.ArrayContains(p.Methods, types.PluginReceive.String()) {
+			if len(p.Methods) == 0 || !msutil.ArrayContains(p.Methods, types.PluginReceive.String()) {
 				continue
 			}
 		}
 		var status types.PluginStatus
-		if p.Status == wkdb.PluginStatusDisabled {
+		if p.Status == msdb.PluginStatusDisabled {
 			status = types.PluginStatusDisabled
 		} else {
 			pg := s.pluginManager.get(p.No)
@@ -103,7 +103,7 @@ func (s *Server) handleGetPlugins(c *wkhttp.Context) {
 }
 
 // 处理插件的路由
-func (s *Server) handlePluginRoute(c *wkhttp.Context) {
+func (s *Server) handlePluginRoute(c *mshttp.Context) {
 	pluginNo := c.Param("plugin")
 	plugin := s.pluginManager.get(pluginNo)
 	if plugin == nil {
@@ -190,7 +190,7 @@ func (s *Server) handlePluginRoute(c *wkhttp.Context) {
 	}
 }
 
-func (s *Server) handleUpdatePluginConfig(c *wkhttp.Context) {
+func (s *Server) handleUpdatePluginConfig(c *mshttp.Context) {
 
 	if !options.G.Auth.HasPermissionWithContext(c, resource.Plugin.ConfigUpdate, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
@@ -271,7 +271,7 @@ func (s *Server) handleUpdatePluginConfig(c *wkhttp.Context) {
 	c.ResponseOK()
 }
 
-func (s *Server) handlePluginBind(c *wkhttp.Context) {
+func (s *Server) handlePluginBind(c *mshttp.Context) {
 
 	if !options.G.Auth.HasPermissionWithContext(c, resource.PluginUser.Add, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
@@ -293,7 +293,7 @@ func (s *Server) handlePluginBind(c *wkhttp.Context) {
 		return
 	}
 
-	leaderId, err := service.Cluster.LeaderIdOfChannel(req.Uid, wkproto.ChannelTypePerson)
+	leaderId, err := service.Cluster.LeaderIdOfChannel(req.Uid, msproto.ChannelTypePerson)
 	if err != nil {
 		s.Error("get leader id failed", zap.Error(err), zap.String("uid", req.Uid))
 		c.ResponseError(err)
@@ -324,7 +324,7 @@ func (s *Server) handlePluginBind(c *wkhttp.Context) {
 	c.ResponseOK()
 }
 
-func (s *Server) handlePluginUnbind(c *wkhttp.Context) {
+func (s *Server) handlePluginUnbind(c *mshttp.Context) {
 
 	if !options.G.Auth.HasPermissionWithContext(c, resource.PluginUser.Delete, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
@@ -346,7 +346,7 @@ func (s *Server) handlePluginUnbind(c *wkhttp.Context) {
 		return
 	}
 
-	leaderId, err := service.Cluster.LeaderIdOfChannel(req.Uid, wkproto.ChannelTypePerson)
+	leaderId, err := service.Cluster.LeaderIdOfChannel(req.Uid, msproto.ChannelTypePerson)
 	if err != nil {
 		s.Error("get leader id failed", zap.Error(err), zap.String("uid", req.Uid))
 		c.ResponseError(err)
@@ -377,14 +377,14 @@ func (s *Server) handlePluginUnbind(c *wkhttp.Context) {
 	c.ResponseOK()
 }
 
-func (s *Server) handlePluginBindList(c *wkhttp.Context) {
+func (s *Server) handlePluginBindList(c *mshttp.Context) {
 	uid := c.Query("uid")
 	pluginNo := c.Query("plugin_no")
-	nodeId := wkutil.ParseUint64(c.Query("node_id"))
+	nodeId := msutil.ParseUint64(c.Query("node_id"))
 
 	if nodeId != 0 && options.G.IsLocalNode(nodeId) {
 		// 本地节点
-		pluginUsers, err := s.searchPluginUsers(wkdb.SearchPluginUserReq{
+		pluginUsers, err := s.searchPluginUsers(msdb.SearchPluginUserReq{
 			Uid:      uid,
 			PluginNo: pluginNo,
 		})
@@ -413,7 +413,7 @@ func (s *Server) handlePluginBindList(c *wkhttp.Context) {
 
 	for _, node := range nodes {
 		if options.G.IsLocalNode(node.Id) {
-			resps, err := s.searchPluginUsers(wkdb.SearchPluginUserReq{
+			resps, err := s.searchPluginUsers(msdb.SearchPluginUserReq{
 				Uid:      uid,
 				PluginNo: pluginNo,
 			})
@@ -486,13 +486,13 @@ func (s *Server) forwardSearchPluginUsers(url string, nodeId uint64) ([]*pluginU
 	}
 
 	var resps []*pluginUserResp
-	if err := wkutil.ReadJSONByByte([]byte(resp.Body), &resps); err != nil {
+	if err := msutil.ReadJSONByByte([]byte(resp.Body), &resps); err != nil {
 		return nil, err
 	}
 	return resps, nil
 }
 
-func (s *Server) searchPluginUsers(req wkdb.SearchPluginUserReq) ([]*pluginUserResp, error) {
+func (s *Server) searchPluginUsers(req msdb.SearchPluginUserReq) ([]*pluginUserResp, error) {
 	pluginUsers, err := service.Store.DB().SearchPluginUsers(req)
 	if err != nil {
 		return nil, err
@@ -505,7 +505,7 @@ func (s *Server) searchPluginUsers(req wkdb.SearchPluginUserReq) ([]*pluginUserR
 	return resps, nil
 }
 
-func (s *Server) handleUninstall(c *wkhttp.Context) {
+func (s *Server) handleUninstall(c *mshttp.Context) {
 
 	if !options.G.Auth.HasPermissionWithContext(c, resource.Plugin.Uninstall, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
@@ -551,7 +551,7 @@ func (s *Server) handleUninstall(c *wkhttp.Context) {
 		return
 	}
 
-	if wkdb.IsEmptyPlugin(plugin) {
+	if msdb.IsEmptyPlugin(plugin) {
 		c.ResponseError(fmt.Errorf("plugin not found"))
 		return
 	}

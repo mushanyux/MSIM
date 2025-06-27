@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	rproto "github.com/WuKongIM/wkrpc/proto"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	rproto "github.com/mushanyux/msrpc/proto"
 	"github.com/panjf2000/gnet/v2"
 )
 

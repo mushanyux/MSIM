@@ -3,13 +3,13 @@ package plugin
 import (
 	"errors"
 
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/wkrpc"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/msrpc"
 	"go.uber.org/zap"
 )
 
-func (a *rpc) clusterConfig(c *wkrpc.Context) {
+func (a *rpc) clusterConfig(c *msrpc.Context) {
 
 	nodes := service.Cluster.Nodes()
 	slots := service.Cluster.Slots()
@@ -49,7 +49,7 @@ func (a *rpc) clusterConfig(c *wkrpc.Context) {
 	c.Write(data)
 }
 
-func (a *rpc) clusterChannelBelongNode(c *wkrpc.Context) {
+func (a *rpc) clusterChannelBelongNode(c *msrpc.Context) {
 
 	req := &pluginproto.ClusterChannelBelongNodeReq{}
 	err := req.Unmarshal(c.Body())

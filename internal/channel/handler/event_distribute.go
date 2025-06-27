@@ -19,7 +19,6 @@ var skipConversationUpdateChannelTypes = []uint8{msproto.ChannelTypeData, msprot
 
 // 分发
 func (h *Handler) distribute(ctx *eventbus.ChannelContext) {
-
 	// 记录消息轨迹
 	events := ctx.Events
 	for _, event := range events {
@@ -60,7 +59,6 @@ func (h *Handler) distributeCommon(ctx *eventbus.ChannelContext) {
 
 // cmd消息分发
 func (h *Handler) distributeOnlineCmd(ctx *eventbus.ChannelContext) {
-
 	// // 按照tagKey分组事件
 	tagKeyEvents := h.groupEventsByTagKey(ctx.Events)
 	var err error
@@ -117,7 +115,7 @@ func (h *Handler) distributeByTag(leaderId uint64, tag *types.Tag, channelId str
 
 	// 本地分发
 	var offlineUids []string // 需要推离线的用户
-	var pubshEvents []*eventbus.Event
+	var pushEvents []*eventbus.Event
 	localHasEvent := false
 	for _, node := range tag.Nodes {
 		if node.LeaderId != options.G.Cluster.NodeId {
@@ -143,15 +141,15 @@ func (h *Handler) distributeByTag(leaderId uint64, tag *types.Tag, channelId str
 
 			for _, event := range events {
 
-				if pubshEvents == nil {
-					pubshEvents = make([]*eventbus.Event, 0, len(events)*len(node.Uids))
+				if pushEvents == nil {
+					pushEvents = make([]*eventbus.Event, 0, len(events)*len(node.Uids))
 				}
 				cloneMsg := event.Clone()
 				cloneMsg.ToUid = uid
 				cloneMsg.ChannelId = channelId
 				cloneMsg.ChannelType = channelType
 				cloneMsg.Type = eventbus.EventPushOnline
-				pubshEvents = append(pubshEvents, cloneMsg)
+				pushEvents = append(pushEvents, cloneMsg)
 
 			}
 		}
@@ -164,8 +162,8 @@ func (h *Handler) distributeByTag(leaderId uint64, tag *types.Tag, channelId str
 		}
 	}
 
-	if len(pubshEvents) > 0 {
-		id := eventbus.Pusher.AddEvents(pubshEvents)
+	if len(pushEvents) > 0 {
+		id := eventbus.Pusher.AddEvents(pushEvents)
 		eventbus.Pusher.Advance(id)
 	}
 	if len(offlineUids) > 0 {
@@ -213,7 +211,6 @@ func (h *Handler) distributeToNode(leaderId uint64, channelId string, channelTyp
 }
 
 func (h *Handler) getCommonTag(ctx *eventbus.ChannelContext) (*types.Tag, error) {
-
 	// 如果当前节点是频道的领导者节点，则可以make tag
 	if options.G.IsLocalNode(ctx.LeaderId) {
 		return h.getOrMakeTagForLeader(ctx.ChannelId, ctx.ChannelType)
@@ -274,13 +271,11 @@ func (h *Handler) getOrMakeTagForLeader(fakeChannelId string, channelType uint8)
 			h.Error("processMakeTag: makeTag failed", zap.Error(err), zap.String("tagKey", tagKey))
 			return nil, err
 		}
-
 	}
 	return tag, nil
 }
 
 func (h *Handler) makeChannelTag(fakeChannelId string, channelType uint8) (*types.Tag, error) {
-
 	var (
 		subscribers []string
 	)
@@ -294,7 +289,6 @@ func (h *Handler) makeChannelTag(fakeChannelId string, channelType uint8) (*type
 		u1, u2 := options.GetFromUIDAndToUIDWith(orgFakeChannelId)
 		subscribers = append(subscribers, u1, u2)
 	} else {
-
 		// 如果是cmd频道需要去对应的源频道获取订阅者来制作tag
 		if options.G.IsCmdChannel(fakeChannelId) {
 			var err error
@@ -332,7 +326,6 @@ func (h *Handler) getSubscribers(fakeChannelId string, channelType uint8) ([]str
 	for _, member := range members {
 		subscribers = append(subscribers, member.Uid)
 	}
-
 	// 如果是客服频道，则从频道id中获取访客id
 	if channelType == msproto.ChannelTypeCustomerService {
 		// 访客id
@@ -359,8 +352,8 @@ func (h *Handler) getCmdSubscribers(channelId string, channelType uint8) ([]stri
 		return nil, errors.New("leaderNode is nil")
 	}
 	leaderId := leaderNode.Id
-	// 如果是本地节点，则直接获取订阅者
 	var subscribers []string
+	// 如果是本地节点，则直接获取订阅者
 	if options.G.IsLocalNode(leaderId) {
 		members, err := service.Store.GetSubscribers(orgFakeChannelId, channelType)
 		if err != nil {

@@ -4,10 +4,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
 	"github.com/lni/goutils/syncutil"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msutil"
 	"github.com/valyala/fastrand"
 	"go.uber.org/zap"
 )
@@ -24,7 +24,7 @@ type tagBlucket struct {
 		m map[string]string
 	}
 	stopper *syncutil.Stopper
-	wklog.Log
+	mslog.Log
 
 	existTagFnc func(tagKey string) bool
 }
@@ -35,7 +35,7 @@ func newTagBlucket(index int, expire time.Duration, existTagFnc func(tagKey stri
 		index:       index,
 		expire:      expire,
 		stopper:     syncutil.NewStopper(),
-		Log:         wklog.NewWKLog("tagBlucket"),
+		Log:         mslog.NewMSLog("tagBlucket"),
 		existTagFnc: existTagFnc,
 	}
 	b.channel.m = make(map[string]string)
@@ -141,20 +141,20 @@ func (b *tagBlucket) existTag(tagKey string) bool {
 
 func (b *tagBlucket) setChannelTag(channelId string, channelType uint8, tagKey string) {
 	b.channel.Lock()
-	b.channel.m[wkutil.ChannelToKey(channelId, channelType)] = tagKey
+	b.channel.m[msutil.ChannelToKey(channelId, channelType)] = tagKey
 	b.channel.Unlock()
 }
 
 func (b *tagBlucket) removeChannelTag(channelId string, channelType uint8) {
 	b.channel.Lock()
-	delete(b.channel.m, wkutil.ChannelToKey(channelId, channelType))
+	delete(b.channel.m, msutil.ChannelToKey(channelId, channelType))
 	b.channel.Unlock()
 }
 
 func (b *tagBlucket) getChannelTag(channelId string, channelType uint8) string {
 	b.channel.RLock()
 	defer b.channel.RUnlock()
-	return b.channel.m[wkutil.ChannelToKey(channelId, channelType)]
+	return b.channel.m[msutil.ChannelToKey(channelId, channelType)]
 }
 
 func (b *tagBlucket) getAllTags() []*types.Tag {

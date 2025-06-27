@@ -11,13 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/WuKongIM/pkg/wkdb"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	"github.com/WuKongIM/wkrpc"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/MSIM/pkg/msdb"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	"github.com/mushanyux/msrpc"
 	"github.com/sendgrid/rest"
 	"go.uber.org/zap"
 )
@@ -27,7 +27,7 @@ const (
 )
 
 // 插件启动
-func (a *rpc) pluginStart(c *wkrpc.Context) {
+func (a *rpc) pluginStart(c *msrpc.Context) {
 	pluginInfo := &pluginproto.PluginInfo{}
 	err := pluginInfo.Unmarshal(c.Body())
 	if err != nil {
@@ -75,9 +75,9 @@ func (a *rpc) pluginStart(c *wkrpc.Context) {
 	}
 
 	var createdAt *time.Time
-	var updatedAt = wkutil.TimePtr(time.Now())
-	if wkdb.IsEmptyPlugin(existPlugin) {
-		createdAt = wkutil.TimePtr(time.Now())
+	var updatedAt = msutil.TimePtr(time.Now())
+	if msdb.IsEmptyPlugin(existPlugin) {
+		createdAt = msutil.TimePtr(time.Now())
 	}
 
 	var configTemplateBytes []byte
@@ -90,7 +90,7 @@ func (a *rpc) pluginStart(c *wkrpc.Context) {
 		}
 	}
 
-	newPlugin := wkdb.Plugin{
+	newPlugin := msdb.Plugin{
 		No:             pluginInfo.No,
 		Name:           pluginInfo.Name,
 		Version:        pluginInfo.Version,
@@ -148,21 +148,21 @@ func (a *rpc) pluginStart(c *wkrpc.Context) {
 }
 
 // 插件是否变更
-func (a *rpc) pluginChange(plugin1, plugin2 wkdb.Plugin) bool {
+func (a *rpc) pluginChange(plugin1, plugin2 msdb.Plugin) bool {
 	if plugin1.No != plugin2.No || plugin1.Version != plugin2.Version {
 		return true
 	}
 	if plugin1.Name != plugin2.Name || !bytes.Equal(plugin1.ConfigTemplate, plugin2.ConfigTemplate) {
 		return true
 	}
-	if plugin1.Priority != plugin2.Priority || !wkutil.ArrayEqual(plugin1.Methods, plugin2.Methods) {
+	if plugin1.Priority != plugin2.Priority || !msutil.ArrayEqual(plugin1.Methods, plugin2.Methods) {
 		return true
 	}
 	return false
 }
 
 // // 插件停止
-// func (a *rpc) pluginStop(c *wkrpc.Context) {
+// func (a *rpc) pluginStop(c *msrpc.Context) {
 // 	pluginInfo := &pluginproto.PluginInfo{}
 // 	err := pluginInfo.Unmarshal(c.Body())
 // 	if err != nil {
@@ -177,14 +177,14 @@ func (a *rpc) pluginChange(plugin1, plugin2 wkdb.Plugin) bool {
 // 	c.WriteOk()
 // }
 
-func (a *rpc) pluginClose(c *wkrpc.Context) {
+func (a *rpc) pluginClose(c *msrpc.Context) {
 	pluginNo := c.Uid()
 	a.s.pluginManager.remove(pluginNo)
 	a.Info("plugin close", zap.String("pluginNo", pluginNo))
 	c.WriteOk()
 }
 
-func (a *rpc) pluginHttpForward(c *wkrpc.Context) {
+func (a *rpc) pluginHttpForward(c *msrpc.Context) {
 	forwardReq := &pluginproto.ForwardHttpReq{}
 	err := forwardReq.Unmarshal(c.Body())
 	if err != nil {

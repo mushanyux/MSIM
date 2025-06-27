@@ -4,12 +4,12 @@ import (
 	"io"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/WuKongIM/pkg/wkdb"
-	"github.com/WuKongIM/WuKongIM/pkg/wkhttp"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
 	lru "github.com/hashicorp/golang-lru/v2"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/MSIM/pkg/msdb"
+	"github.com/mushanyux/MSIM/pkg/mshttp"
+	"github.com/mushanyux/MSIM/pkg/msutil"
 )
 
 type pluginResp struct {
@@ -30,7 +30,7 @@ type pluginResp struct {
 // 默认隐藏secret字段的值
 const secretHidden = "******"
 
-func newPluginResp(p wkdb.Plugin) *pluginResp {
+func newPluginResp(p msdb.Plugin) *pluginResp {
 	cfgTemplate := &pluginproto.ConfigTemplate{}
 	if len(p.ConfigTemplate) > 0 {
 		_ = cfgTemplate.Unmarshal(p.ConfigTemplate)
@@ -46,7 +46,7 @@ func newPluginResp(p wkdb.Plugin) *pluginResp {
 	}
 
 	isAI := uint8(0)
-	if len(p.Methods) > 0 && wkutil.ArrayContains(p.Methods, types.PluginReceive.String()) {
+	if len(p.Methods) > 0 && msutil.ArrayContains(p.Methods, types.PluginReceive.String()) {
 		isAI = 1
 	}
 
@@ -64,12 +64,12 @@ func newPluginResp(p wkdb.Plugin) *pluginResp {
 	}
 }
 
-func BindJSON(obj any, c *wkhttp.Context) ([]byte, error) {
+func BindJSON(obj any, c *mshttp.Context) ([]byte, error) {
 	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		return nil, err
 	}
-	if err := wkutil.ReadJSONByByte(bodyBytes, obj); err != nil {
+	if err := msutil.ReadJSONByByte(bodyBytes, obj); err != nil {
 		return nil, err
 	}
 	return bodyBytes, nil
@@ -82,7 +82,7 @@ type pluginUserResp struct {
 	UpdatedAt uint64 `json:"updated_at"`
 }
 
-func newPluginUserResp(pu wkdb.PluginUser) *pluginUserResp {
+func newPluginUserResp(pu msdb.PluginUser) *pluginUserResp {
 
 	var createdAt uint64
 	if pu.CreatedAt != nil {

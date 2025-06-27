@@ -10,7 +10,6 @@ import (
 
 // 收到流消息
 func (h *Handler) onStream(ctx *eventbus.ChannelContext) {
-
 	for _, event := range ctx.Events {
 		event.ReasonCode = msproto.ReasonSuccess
 	}
@@ -22,7 +21,6 @@ func (h *Handler) onStream(ctx *eventbus.ChannelContext) {
 
 // 持久化流消息
 func (h *Handler) persistStreams(ctx *eventbus.ChannelContext) {
-
 	events := ctx.Events
 	// 存储消息
 	streams := h.toPersistStreams(events)
@@ -55,12 +53,10 @@ func (h *Handler) persistStreams(ctx *eventbus.ChannelContext) {
 		eventbus.Channel.AddEvent(ctx.ChannelId, ctx.ChannelType, cloneEvent)
 	}
 	eventbus.Channel.Advance(ctx.ChannelId, ctx.ChannelType)
-
 }
 
 // 转换成存储消息
 func (h *Handler) toPersistStreams(events []*eventbus.Event) []*msdb.Stream {
-
 	var streams []*msdb.Stream
 	for _, e := range events {
 		sendPacket := e.Frame.(*msproto.SendPacket)

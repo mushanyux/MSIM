@@ -1,8 +1,8 @@
 package ingress
 
 import (
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	msproto "github.com/mushanyux/MSIMGoProto"
 )
 
 type TagReq struct {
@@ -13,7 +13,7 @@ type TagReq struct {
 }
 
 func (t *TagReq) encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	enc.WriteString(t.TagKey)
 	enc.WriteString(t.ChannelId)
 	enc.WriteUint8(t.ChannelType)
@@ -22,7 +22,7 @@ func (t *TagReq) encode() ([]byte, error) {
 }
 
 func (t *TagReq) decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	var err error
 	if t.TagKey, err = dec.String(); err != nil {
 		return err
@@ -45,7 +45,7 @@ type TagResp struct {
 }
 
 func (t *TagResp) encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	defer enc.End()
 	enc.WriteString(t.TagKey)
 	enc.WriteUint32(uint32(len(t.Uids)))
@@ -56,7 +56,7 @@ func (t *TagResp) encode() ([]byte, error) {
 }
 
 func (t *TagResp) decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	tagKey, err := dec.String()
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ type AllowSendReq struct {
 
 func (a *AllowSendReq) decode(data []byte) error {
 
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	var err error
 	if a.From, err = dec.String(); err != nil {
 		return err
@@ -96,7 +96,7 @@ func (a *AllowSendReq) decode(data []byte) error {
 }
 
 func (a *AllowSendReq) encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	defer enc.End()
 	enc.WriteString(a.From)
 	enc.WriteString(a.To)
@@ -113,7 +113,7 @@ type TagUpdateReq struct {
 }
 
 func (t *TagUpdateReq) Encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	enc.WriteString(t.TagKey)
 	enc.WriteString(t.ChannelId)
 	enc.WriteUint8(t.ChannelType)
@@ -121,13 +121,13 @@ func (t *TagUpdateReq) Encode() ([]byte, error) {
 	for _, uid := range t.Uids {
 		enc.WriteString(uid)
 	}
-	enc.WriteUint8(wkutil.BoolToUint8(t.Remove))
-	enc.WriteUint8(wkutil.BoolToUint8(t.ChannelTag))
+	enc.WriteUint8(msutil.BoolToUint8(t.Remove))
+	enc.WriteUint8(msutil.BoolToUint8(t.ChannelTag))
 	return enc.Bytes(), nil
 }
 
 func (t *TagUpdateReq) Decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	var err error
 	if t.TagKey, err = dec.String(); err != nil {
 		return err
@@ -153,12 +153,12 @@ func (t *TagUpdateReq) Decode(data []byte) error {
 	if err != nil {
 		return err
 	}
-	t.Remove = wkutil.Uint8ToBool(remove)
+	t.Remove = msutil.Uint8ToBool(remove)
 	channelTag, err := dec.Uint8()
 	if err != nil {
 		return err
 	}
-	t.ChannelTag = wkutil.Uint8ToBool(channelTag)
+	t.ChannelTag = msutil.Uint8ToBool(channelTag)
 	return nil
 }
 
@@ -168,7 +168,7 @@ type TagAddReq struct {
 }
 
 func (t *TagAddReq) Encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	defer enc.End()
 	enc.WriteString(t.TagKey)
 	enc.WriteUint32(uint32(len(t.Uids)))
@@ -179,7 +179,7 @@ func (t *TagAddReq) Encode() ([]byte, error) {
 }
 
 func (t *TagAddReq) Decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	var err error
 	if t.TagKey, err = dec.String(); err != nil {
 		return err
@@ -204,14 +204,14 @@ type ChannelReq struct {
 }
 
 func (c *ChannelReq) Encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	enc.WriteString(c.ChannelId)
 	enc.WriteUint8(c.ChannelType)
 	return enc.Bytes(), nil
 }
 
 func (c *ChannelReq) Decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	var err error
 	if c.ChannelId, err = dec.String(); err != nil {
 		return err
@@ -227,7 +227,7 @@ type SubscribersResp struct {
 }
 
 func (s *SubscribersResp) Encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	defer enc.End()
 	enc.WriteUint32(uint32(len(s.Subscribers)))
 	for _, uid := range s.Subscribers {
@@ -237,7 +237,7 @@ func (s *SubscribersResp) Encode() ([]byte, error) {
 }
 
 func (s *SubscribersResp) Decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	count, err := dec.Uint32()
 	if err != nil {
 		return err
@@ -258,7 +258,7 @@ type StreamReq struct {
 }
 
 func (s *StreamReq) Encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	defer enc.End()
 
 	enc.WriteUint32(uint32(len(s.StreamNos)))
@@ -269,7 +269,7 @@ func (s *StreamReq) Encode() ([]byte, error) {
 }
 
 func (s *StreamReq) Decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	count, err := dec.Uint32()
 	if err != nil {
 		return err
@@ -296,7 +296,7 @@ type Stream struct {
 }
 
 func (s *StreamResp) Encode() ([]byte, error) {
-	enc := wkproto.NewEncoder()
+	enc := msproto.NewEncoder()
 	defer enc.End()
 	enc.WriteUint32(uint32(len(s.Streams)))
 	for _, stream := range s.Streams {
@@ -309,7 +309,7 @@ func (s *StreamResp) Encode() ([]byte, error) {
 }
 
 func (s *StreamResp) Decode(data []byte) error {
-	dec := wkproto.NewDecoder(data)
+	dec := msproto.NewDecoder(data)
 	count, err := dec.Uint32()
 	if err != nil {
 		return err

@@ -5,16 +5,16 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/internal/types/pluginproto"
-	"github.com/WuKongIM/WuKongIM/pkg/wkutil"
-	wkproto "github.com/WuKongIM/WuKongIMGoProto"
-	"github.com/WuKongIM/wkrpc"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/internal/types/pluginproto"
+	"github.com/mushanyux/MSIM/pkg/msutil"
+	msproto "github.com/mushanyux/MSIMGoProto"
+	"github.com/mushanyux/msrpc"
 	"go.uber.org/zap"
 )
 
-func (a *rpc) streamOpen(c *wkrpc.Context) {
+func (a *rpc) streamOpen(c *msrpc.Context) {
 	streamInfo := &pluginproto.Stream{}
 	err := streamInfo.Unmarshal(c.Body())
 	if err != nil {
@@ -42,7 +42,7 @@ func (a *rpc) streamOpen(c *wkrpc.Context) {
 	c.Write(data)
 }
 
-func (a *rpc) streamClose(c *wkrpc.Context) {
+func (a *rpc) streamClose(c *msrpc.Context) {
 	req := &pluginproto.StreamCloseReq{}
 	err := req.Unmarshal(c.Body())
 	if err != nil {
@@ -61,7 +61,7 @@ func (a *rpc) streamClose(c *wkrpc.Context) {
 	c.WriteOk()
 }
 
-func (a *rpc) streamWrite(c *wkrpc.Context) {
+func (a *rpc) streamWrite(c *msrpc.Context) {
 	req := &pluginproto.StreamWriteReq{}
 	err := req.Unmarshal(c.Body())
 	if err != nil {
@@ -71,7 +71,7 @@ func (a *rpc) streamWrite(c *wkrpc.Context) {
 	}
 
 	// 转换假频道为真频道
-	if req.ChannelType == uint32(wkproto.ChannelTypePerson) && options.G.IsFakeChannel(req.ChannelId) {
+	if req.ChannelType == uint32(msproto.ChannelTypePerson) && options.G.IsFakeChannel(req.ChannelId) {
 		from, to := options.GetFromUIDAndToUIDWith(req.ChannelId)
 		fromUid := req.FromUid
 		if strings.TrimSpace(fromUid) == "" {
@@ -117,12 +117,12 @@ func (a *rpc) requestStreamOpen(stream *pluginproto.Stream) (string, error) {
 	redot := uint8(0)
 	syncOnce := uint8(0)
 	if stream.Header != nil {
-		noPersist = wkutil.BoolToUint8(stream.Header.NoPersist)
-		redot = wkutil.BoolToUint8(stream.Header.RedDot)
-		syncOnce = wkutil.BoolToUint8(stream.Header.SyncOnce)
+		noPersist = msutil.BoolToUint8(stream.Header.NoPersist)
+		redot = msutil.BoolToUint8(stream.Header.RedDot)
+		syncOnce = msutil.BoolToUint8(stream.Header.SyncOnce)
 	}
 
-	resp, err := a.post(reqUrl, []byte(wkutil.ToJSON(map[string]interface{}{
+	resp, err := a.post(reqUrl, []byte(msutil.ToJSON(map[string]interface{}{
 		"header": map[string]interface{}{
 			"no_persist": noPersist,
 			"red_dot":    redot,
@@ -139,7 +139,7 @@ func (a *rpc) requestStreamOpen(stream *pluginproto.Stream) (string, error) {
 		return "", err
 	}
 
-	resultMap, err := wkutil.JSONToMap(resp.Body)
+	resultMap, err := msutil.JSONToMap(resp.Body)
 	if err != nil {
 		a.Error("requestStreamOpen: JSONToMap failed", zap.Error(err))
 		return "", err
@@ -161,7 +161,7 @@ func (a *rpc) requestStreamClose(req *pluginproto.StreamCloseReq) error {
 
 	reqUrl := node.ApiServerAddr + "/stream/close"
 
-	_, err := a.post(reqUrl, []byte(wkutil.ToJSON(map[string]interface{}{
+	_, err := a.post(reqUrl, []byte(msutil.ToJSON(map[string]interface{}{
 		"stream_no":    req.StreamNo,
 		"channel_id":   req.ChannelId,
 		"channel_type": req.ChannelType,
@@ -186,12 +186,12 @@ func (a *rpc) requestStreamWrite(req *pluginproto.StreamWriteReq) (*pluginproto.
 	redot := uint8(0)
 	syncOnce := uint8(0)
 	if req.Header != nil {
-		noPersist = wkutil.BoolToUint8(req.Header.NoPersist)
-		redot = wkutil.BoolToUint8(req.Header.RedDot)
-		syncOnce = wkutil.BoolToUint8(req.Header.SyncOnce)
+		noPersist = msutil.BoolToUint8(req.Header.NoPersist)
+		redot = msutil.BoolToUint8(req.Header.RedDot)
+		syncOnce = msutil.BoolToUint8(req.Header.SyncOnce)
 	}
 
-	resp, err := a.post(reqUrl, []byte(wkutil.ToJSON(map[string]interface{}{
+	resp, err := a.post(reqUrl, []byte(msutil.ToJSON(map[string]interface{}{
 		"header": map[string]interface{}{
 			"no_persist": noPersist,
 			"red_dot":    redot,
@@ -208,7 +208,7 @@ func (a *rpc) requestStreamWrite(req *pluginproto.StreamWriteReq) (*pluginproto.
 		return nil, err
 	}
 
-	resultMap, err := wkutil.JSONToMap(resp.Body)
+	resultMap, err := msutil.JSONToMap(resp.Body)
 	if err != nil {
 		a.Error("requestStreamWrite: JSONToMap failed", zap.Error(err))
 		return nil, err

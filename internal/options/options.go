@@ -11,12 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/WuKongIM/crypto/tls"
 	"github.com/bwmarrin/snowflake"
 	"github.com/google/uuid"
 	"github.com/mushanyux/MSIM/pkg/auth"
 	"github.com/mushanyux/MSIM/pkg/auth/resource"
 	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/crypto/tls"
 	"github.com/pkg/errors"
 	"github.com/sasha-s/go-deadlock"
 

@@ -73,7 +73,6 @@ func (h *Handler) notForwardToLeader(eventType eventbus.EventType) bool {
 		return true
 	}
 	return false
-
 }
 
 func (h *Handler) forwardsToNode(nodeId uint64, channelId string, channelType uint8, events []*eventbus.Event) {
@@ -121,10 +120,8 @@ func (h *Handler) onForwardChannelEvent(m *proto.Message) {
 		eventbus.Channel.AddEvent(req.channelId, req.channelType, e)
 	}
 	eventbus.Channel.Advance(req.channelId, req.channelType)
-
 }
 
 func (h *Handler) WithTimeout() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), options.G.Channel.ProcessTimeout)
-
 }

@@ -31,7 +31,7 @@ type managerServer struct {
 func newManagerServer(s *Server) *managerServer {
 	// r := mshttp.New()
 	log := mslog.NewMSLog("managerServer")
-	r := mshttp.NewWithLogger(mshttp.LoggerWithWklog(log))
+	r := mshttp.NewWithLogger(mshttp.LoggerWithMslog(log))
 
 	return &managerServer{
 		addr: options.G.Manager.Addr,

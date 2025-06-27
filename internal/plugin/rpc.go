@@ -1,18 +1,18 @@
 package plugin
 
 import (
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
+	"github.com/mushanyux/MSIM/pkg/mslog"
 )
 
 type rpc struct {
 	s *Server
-	wklog.Log
+	mslog.Log
 }
 
 func newRpc(s *Server) *rpc {
 	return &rpc{
 		s:   s,
-		Log: wklog.NewWKLog("plugin.rpc"),
+		Log: mslog.NewMSLog("plugin.rpc"),
 	}
 }
 

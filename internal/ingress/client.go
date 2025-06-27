@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/WuKongIM/WuKongIM/internal/service"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
-	"github.com/WuKongIM/WuKongIM/pkg/wkserver/proto"
+	"github.com/mushanyux/MSIM/internal/service"
+	"github.com/mushanyux/MSIM/pkg/mslog"
+	"github.com/mushanyux/MSIM/pkg/msserver/proto"
 	"go.uber.org/zap"
 )
 
 type Client struct {
-	wklog.Log
+	mslog.Log
 }
 
 func NewClient() *Client {
 	return &Client{
-		Log: wklog.NewWKLog("ingress.Client"),
+		Log: mslog.NewMSLog("ingress.Client"),
 	}
 }
 
@@ -28,7 +28,7 @@ func (c *Client) RequestTag(toNodeId uint64, req *TagReq) (*TagResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.request(toNodeId, "/wk/ingress/getTag", data)
+	resp, err := c.request(toNodeId, "/ms/ingress/getTag", data)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Client) UpdateTag(nodeId uint64, req *TagUpdateReq) error {
 	}
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	resp, err := service.Cluster.RequestWithContext(timeoutCtx, nodeId, "/wk/ingress/updateTag", data)
+	resp, err := service.Cluster.RequestWithContext(timeoutCtx, nodeId, "/ms/ingress/updateTag", data)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (c *Client) AddTag(nodeId uint64, req *TagAddReq) error {
 	}
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	resp, err := service.Cluster.RequestWithContext(timeoutCtx, nodeId, "/wk/ingress/addTag", data)
+	resp, err := service.Cluster.RequestWithContext(timeoutCtx, nodeId, "/ms/ingress/addTag", data)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (c *Client) RequestAllowSendForPerson(toNodeId uint64, from, to string) (*p
 	if err != nil {
 		return nil, err
 	}
-	return c.request(toNodeId, "/wk/ingress/allowSend", data)
+	return c.request(toNodeId, "/ms/ingress/allowSend", data)
 }
 
 func (c *Client) RequestSubscribers(toNodeId uint64, channelId string, channelType uint8) ([]string, error) {
@@ -105,7 +105,7 @@ func (c *Client) RequestSubscribers(toNodeId uint64, channelId string, channelTy
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.request(toNodeId, "/wk/ingress/getSubscribers", data)
+	resp, err := c.request(toNodeId, "/ms/ingress/getSubscribers", data)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c *Client) RequestStreams(toNodeId uint64, streamNos []string) (*StreamRes
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.request(toNodeId, "/wk/ingress/getStreams", data)
+	resp, err := c.request(toNodeId, "/ms/ingress/getStreams", data)
 	if err != nil {
 		return nil, err
 	}

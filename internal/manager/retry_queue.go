@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/RussellLuo/timingwheel"
-	"github.com/WuKongIM/WuKongIM/internal/options"
-	"github.com/WuKongIM/WuKongIM/internal/types"
-	"github.com/WuKongIM/WuKongIM/pkg/wklog"
+	"github.com/mushanyux/MSIM/internal/options"
+	"github.com/mushanyux/MSIM/internal/types"
+	"github.com/mushanyux/MSIM/pkg/mslog"
 	"github.com/valyala/fastrand"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
@@ -23,7 +23,7 @@ type RetryQueue struct {
 	inFlightMessages map[string]*types.RetryMessage
 	inFlightMutex    sync.Mutex
 	fakeMessageID    int64
-	wklog.Log
+	mslog.Log
 	r          *RetryManager
 	stopped    atomic.Bool
 	retryTimer *timingwheel.Timer
@@ -37,7 +37,7 @@ func NewRetryQueue(index int, r *RetryManager) *RetryQueue {
 		inFlightPQ:       newInFlightPqueue(4056),
 		inFlightMessages: make(map[string]*types.RetryMessage),
 		fakeMessageID:    10000,
-		Log:              wklog.NewWKLog(fmt.Sprintf("RetryQueue[%d]", index)),
+		Log:              mslog.NewMSLog(fmt.Sprintf("RetryQueue[%d]", index)),
 	}
 }
 

@@ -28,7 +28,7 @@ type apiServer struct {
 func newApiServer(s *Server) *apiServer {
 	// r := mshttp.New()
 	log := mslog.NewMSLog("apiServer")
-	r := mshttp.NewWithLogger(mshttp.LoggerWithWklog(log))
+	r := mshttp.NewWithLogger(mshttp.LoggerWithMslog(log))
 
 	if options.G.PprofOn {
 		pprof.Register(r.GetGinRoute()) // 注册pprof
