@@ -61,7 +61,6 @@ func (h *Handler) recvack(event *eventbus.Event) {
 						zap.Uint8("channelType", currMsg.ChannelType),
 					)
 				}
-
 			} else {
 				h.Trace("收到消息回执",
 					"recvack",

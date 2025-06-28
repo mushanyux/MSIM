@@ -38,7 +38,6 @@ func (f *forwardChannelEventReq) encode() ([]byte, error) {
 func (f *forwardChannelEventReq) decode(data []byte) error {
 	dec := msproto.NewDecoder(data)
 	var err error
-
 	if f.channelId, err = dec.String(); err != nil {
 		return err
 	}

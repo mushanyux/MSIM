@@ -37,5 +37,4 @@ func (h *Handler) connack(ctx *eventbus.UserContext) {
 		}
 		eventbus.User.ConnWrite(event.ReqId, conn, connack)
 	}
-
 }

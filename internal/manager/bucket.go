@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type tagBlucket struct {
+type tagBucket struct {
 	tag struct {
 		m map[string]*types.Tag
 		sync.RWMutex
@@ -29,13 +29,12 @@ type tagBlucket struct {
 	existTagFnc func(tagKey string) bool
 }
 
-func newTagBlucket(index int, expire time.Duration, existTagFnc func(tagKey string) bool) *tagBlucket {
-
-	b := &tagBlucket{
+func newtagBucket(index int, expire time.Duration, existTagFnc func(tagKey string) bool) *tagBucket {
+	b := &tagBucket{
 		index:       index,
 		expire:      expire,
 		stopper:     syncutil.NewStopper(),
-		Log:         mslog.NewMSLog("tagBlucket"),
+		Log:         mslog.NewMSLog("tagBucket"),
 		existTagFnc: existTagFnc,
 	}
 	b.channel.m = make(map[string]string)
@@ -43,17 +42,16 @@ func newTagBlucket(index int, expire time.Duration, existTagFnc func(tagKey stri
 	return b
 }
 
-func (b *tagBlucket) start() error {
+func (b *tagBucket) start() error {
 	b.stopper.RunWorker(b.loop)
 	return nil
 }
 
-func (b *tagBlucket) stop() {
+func (b *tagBucket) stop() {
 	b.stopper.Stop()
 }
 
-func (b *tagBlucket) loop() {
-
+func (b *tagBucket) loop() {
 	scanInterval := b.expire / 2
 
 	p := float64(fastrand.Uint32()) / (1 << 32)
@@ -71,7 +69,7 @@ func (b *tagBlucket) loop() {
 	}
 }
 
-func (b *tagBlucket) checkExpireTags() {
+func (b *tagBucket) checkExpireTags() {
 	b.tag.Lock()
 	// tag过期检查
 	var removeTags []string // 需要移除的tagKey
@@ -114,50 +112,50 @@ func (b *tagBlucket) checkExpireTags() {
 	b.channel.Unlock()
 }
 
-func (b *tagBlucket) setTag(tag *types.Tag) {
+func (b *tagBucket) setTag(tag *types.Tag) {
 	b.tag.Lock()
 	b.tag.m[tag.Key] = tag
 	b.tag.Unlock()
 }
 
-func (b *tagBlucket) getTag(tagKey string) *types.Tag {
+func (b *tagBucket) getTag(tagKey string) *types.Tag {
 	b.tag.RLock()
 	defer b.tag.RUnlock()
 	return b.tag.m[tagKey]
 }
 
-func (b *tagBlucket) removeTag(tagKey string) {
+func (b *tagBucket) removeTag(tagKey string) {
 	b.tag.Lock()
 	defer b.tag.Unlock()
 	delete(b.tag.m, tagKey)
 }
 
-func (b *tagBlucket) existTag(tagKey string) bool {
+func (b *tagBucket) existTag(tagKey string) bool {
 	b.tag.RLock()
 	defer b.tag.RUnlock()
 	_, ok := b.tag.m[tagKey]
 	return ok
 }
 
-func (b *tagBlucket) setChannelTag(channelId string, channelType uint8, tagKey string) {
+func (b *tagBucket) setChannelTag(channelId string, channelType uint8, tagKey string) {
 	b.channel.Lock()
 	b.channel.m[msutil.ChannelToKey(channelId, channelType)] = tagKey
 	b.channel.Unlock()
 }
 
-func (b *tagBlucket) removeChannelTag(channelId string, channelType uint8) {
+func (b *tagBucket) removeChannelTag(channelId string, channelType uint8) {
 	b.channel.Lock()
 	delete(b.channel.m, msutil.ChannelToKey(channelId, channelType))
 	b.channel.Unlock()
 }
 
-func (b *tagBlucket) getChannelTag(channelId string, channelType uint8) string {
+func (b *tagBucket) getChannelTag(channelId string, channelType uint8) string {
 	b.channel.RLock()
 	defer b.channel.RUnlock()
 	return b.channel.m[msutil.ChannelToKey(channelId, channelType)]
 }
 
-func (b *tagBlucket) getAllTags() []*types.Tag {
+func (b *tagBucket) getAllTags() []*types.Tag {
 	b.tag.RLock()
 	defer b.tag.RUnlock()
 	tags := make([]*types.Tag, 0, len(b.tag.m))
@@ -167,7 +165,7 @@ func (b *tagBlucket) getAllTags() []*types.Tag {
 	return tags
 }
 
-func (b *tagBlucket) getAllChannelTags() map[string]string {
+func (b *tagBucket) getAllChannelTags() map[string]string {
 	b.channel.RLock()
 	defer b.channel.RUnlock()
 	channelTags := make(map[string]string)

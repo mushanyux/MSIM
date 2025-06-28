@@ -23,7 +23,6 @@ type pushHandler struct {
 }
 
 func newPushHandler(id int, poller *poller) *pushHandler {
-
 	uh := &pushHandler{
 		id:      id,
 		poller:  poller,
@@ -39,7 +38,6 @@ func (p *pushHandler) addEvent(event *eventbus.Event) {
 	defer p.pending.Unlock()
 	event.Index = p.pending.eventQueue.LastIndex() + 1
 	p.pending.eventQueue.Append(event)
-
 }
 
 func (p *pushHandler) hasEvent() bool {
@@ -65,7 +63,6 @@ func (p *pushHandler) events() []*eventbus.Event {
 
 // 推进事件
 func (p *pushHandler) advanceEvents(events []*eventbus.Event) {
-
 	// 按类型分组
 	group := p.groupByType(events)
 	// 处理事件
@@ -77,7 +74,6 @@ func (p *pushHandler) advanceEvents(events []*eventbus.Event) {
 		ctx.Events = events
 		// 处理事件
 		p.handler.OnEvent(ctx)
-
 		// 释放上下文
 		p.poller.putContext(ctx)
 	}

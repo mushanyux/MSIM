@@ -28,11 +28,8 @@ import (
 )
 
 func (s *Server) SetRoute(r *mshttp.MSHttp) {
-
-	r.Any("/plugins/:plugin/*path", s.handlePluginRoute) // 处理插件的路由，将http请求转发给插件
-
-	r.GET("/plugins", s.handleGetPlugins) // 获取插件列表
-
+	r.Any("/plugins/:plugin/*path", s.handlePluginRoute)        // 处理插件的路由，将http请求转发给插件
+	r.GET("/plugins", s.handleGetPlugins)                       // 获取插件列表
 	r.POST("/pluginconfig/:plugin", s.handleUpdatePluginConfig) // 更新插件配置
 	r.POST("/plugin/bind", s.handlePluginBind)                  // 绑定插件
 	r.GET("/plugin/bind", s.handlePluginBindList)               // 获取插件绑定列表
@@ -43,7 +40,6 @@ func (s *Server) SetRoute(r *mshttp.MSHttp) {
 // 获取插件列表
 
 func (s *Server) handleGetPlugins(c *mshttp.Context) {
-
 	typeStr := c.Query("type") // 插件类型 ai: 机器人插件
 	nodeId := msutil.ParseUint64(c.Query("node_id"))
 
@@ -191,7 +187,6 @@ func (s *Server) handlePluginRoute(c *mshttp.Context) {
 }
 
 func (s *Server) handleUpdatePluginConfig(c *mshttp.Context) {
-
 	if !options.G.Auth.HasPermissionWithContext(c, resource.Plugin.ConfigUpdate, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
 		return
@@ -272,7 +267,6 @@ func (s *Server) handleUpdatePluginConfig(c *mshttp.Context) {
 }
 
 func (s *Server) handlePluginBind(c *mshttp.Context) {
-
 	if !options.G.Auth.HasPermissionWithContext(c, resource.PluginUser.Add, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
 		return
@@ -325,7 +319,6 @@ func (s *Server) handlePluginBind(c *mshttp.Context) {
 }
 
 func (s *Server) handlePluginUnbind(c *mshttp.Context) {
-
 	if !options.G.Auth.HasPermissionWithContext(c, resource.PluginUser.Delete, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
 		return
@@ -506,7 +499,6 @@ func (s *Server) searchPluginUsers(req msdb.SearchPluginUserReq) ([]*pluginUserR
 }
 
 func (s *Server) handleUninstall(c *mshttp.Context) {
-
 	if !options.G.Auth.HasPermissionWithContext(c, resource.Plugin.Uninstall, auth.ActionWrite) {
 		c.ResponseErrorWithStatus(http.StatusForbidden, errors.New("没有权限"))
 		return

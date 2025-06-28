@@ -16,7 +16,7 @@ import (
 )
 
 type TagManager struct {
-	bluckets []*tagBlucket
+	bluckets []*tagBucket
 	// 获取当前节点版本号
 	nodeVersion func() uint64
 	mslog.Log
@@ -28,9 +28,9 @@ func NewTagManager(blucketCount int, nodeVersion func() uint64) *TagManager {
 		nodeVersion: nodeVersion,
 		Log:         mslog.NewMSLog("TagManager"),
 	}
-	tg.bluckets = make([]*tagBlucket, blucketCount)
+	tg.bluckets = make([]*tagBucket, blucketCount)
 	for i := 0; i < blucketCount; i++ {
-		tg.bluckets[i] = newTagBlucket(i, options.G.Tag.Expire, tg.existTag)
+		tg.bluckets[i] = newtagBucket(i, options.G.Tag.Expire, tg.existTag)
 	}
 	return tg
 }
@@ -234,14 +234,14 @@ func (t *TagManager) GetAllChannelTags() map[string]string {
 	return channelTags
 }
 
-func (t *TagManager) getBlucketByTagKey(tagKey string) *tagBlucket {
+func (t *TagManager) getBlucketByTagKey(tagKey string) *tagBucket {
 	h := fnv.New32a()
 	h.Write([]byte(tagKey))
 	i := h.Sum32() % uint32(len(t.bluckets))
 	return t.bluckets[i]
 }
 
-func (t *TagManager) getBlucketByChannel(channelId string, channelType uint8) *tagBlucket {
+func (t *TagManager) getBlucketByChannel(channelId string, channelType uint8) *tagBucket {
 	h := fnv.New32a()
 	h.Write([]byte(msutil.ChannelToKey(channelId, channelType)))
 	i := h.Sum32() % uint32(len(t.bluckets))

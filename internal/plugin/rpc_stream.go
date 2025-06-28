@@ -104,7 +104,6 @@ func (a *rpc) streamWrite(c *msrpc.Context) {
 }
 
 func (a *rpc) requestStreamOpen(stream *pluginproto.Stream) (string, error) {
-
 	node := service.Cluster.NodeInfoById(options.G.Cluster.NodeId)
 	if node == nil {
 		a.Error("requestStreamOpen: node not found", zap.Uint64("nodeId", options.G.Cluster.NodeId))
@@ -152,7 +151,6 @@ func (a *rpc) requestStreamOpen(stream *pluginproto.Stream) (string, error) {
 }
 
 func (a *rpc) requestStreamClose(req *pluginproto.StreamCloseReq) error {
-
 	node := service.Cluster.NodeInfoById(options.G.Cluster.NodeId)
 	if node == nil {
 		a.Error("requestStreamClose: node not found", zap.Uint64("nodeId", options.G.Cluster.NodeId))
@@ -173,7 +171,6 @@ func (a *rpc) requestStreamClose(req *pluginproto.StreamCloseReq) error {
 }
 
 func (a *rpc) requestStreamWrite(req *pluginproto.StreamWriteReq) (*pluginproto.StreamWriteResp, error) {
-
 	node := service.Cluster.NodeInfoById(options.G.Cluster.NodeId)
 	if node == nil {
 		a.Error("requestStreamWrite: node not found", zap.Uint64("nodeId", options.G.Cluster.NodeId))

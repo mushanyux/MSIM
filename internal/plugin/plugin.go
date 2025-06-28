@@ -36,7 +36,6 @@ func (p *Plugin) GetNo() string {
 }
 
 func (p *Plugin) send(msgType uint32, data []byte) error {
-
 	return p.s.rpcServer.Send(p.info.No, &rproto.Message{
 		MsgType: msgType,
 		Content: data,
@@ -72,7 +71,6 @@ func (p *Plugin) invokeMethod(ctx context.Context, method types.PluginMethod, da
 }
 
 func (p *Plugin) invoke(ctx context.Context, pathStr string, data []byte) ([]byte, error) {
-
 	resp, err := p.s.rpcServer.RequestWithContext(ctx, p.info.No, pathStr, data)
 	if err != nil {
 		return nil, err
@@ -105,7 +103,6 @@ func (p *Plugin) Send(ctx context.Context, sendPacket *pluginproto.SendPacket) (
 
 // 存储后
 func (p *Plugin) PersistAfter(ctx context.Context, messages *pluginproto.MessageBatch) error {
-
 	data, err := messages.Marshal()
 	if err != nil {
 		return err
@@ -122,7 +119,6 @@ func (p *Plugin) PersistAfter(ctx context.Context, messages *pluginproto.Message
 
 // 回复消息
 func (p *Plugin) Receive(ctx context.Context, recv *pluginproto.RecvPacket) error {
-
 	data, err := recv.Marshal()
 	if err != nil {
 		return err

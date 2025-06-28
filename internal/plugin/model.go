@@ -83,7 +83,6 @@ type pluginUserResp struct {
 }
 
 func newPluginUserResp(pu msdb.PluginUser) *pluginUserResp {
-
 	var createdAt uint64
 	if pu.CreatedAt != nil {
 		createdAt = uint64(pu.CreatedAt.UnixNano())

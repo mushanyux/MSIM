@@ -11,11 +11,9 @@ type IConnManager interface {
 	RemoveConn(conn msnet.Conn)
 	// GetConn 获取连接
 	GetConn(connID int64) msnet.Conn
-
 	// GetConnByFd 根据fd获取连接
 	GetConnByFd(fd int) msnet.Conn
 	// ConnCount 获取连接数量
 	ConnCount() int
-
 	GetAllConn() []msnet.Conn
 }

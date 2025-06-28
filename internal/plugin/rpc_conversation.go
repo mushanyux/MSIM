@@ -86,17 +86,14 @@ func (a *rpc) conversationChannels(c *msrpc.Context) {
 
 // ForwardWithBody 转发请求
 func (a *rpc) post(url string, body []byte) (*rest.Response, error) {
-
 	req := rest.Request{
 		Method:  rest.Post,
 		BaseURL: url,
 		Body:    body,
 	}
-
 	resp, err := rest.Send(req)
 	if err != nil {
 		return nil, err
 	}
-
 	return resp, nil
 }

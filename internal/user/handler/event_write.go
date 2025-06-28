@@ -30,21 +30,18 @@ func (h *Handler) writeFrame(ctx *eventbus.UserContext) {
 			h.forwardsToNode(conn.NodeId, conn.Uid, []*eventbus.Event{event})
 			continue
 		}
-
 		// 本地节点写请求
 		h.writeLocalFrame(event)
-
 	}
 }
+
 func (h *Handler) writeLocalFrame(event *eventbus.Event) {
 	conn := event.Conn
 	frame := event.Frame
-
 	var (
 		data []byte
 		err  error
 	)
-
 	if conn.IsJsonRpc {
 		req, err := jsonrpc.FromFrame(event.ReqId, frame)
 		if err != nil {

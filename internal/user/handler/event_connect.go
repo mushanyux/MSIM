@@ -227,7 +227,6 @@ func (h *Handler) handleConnect(event *eventbus.Event) (msproto.ReasonCode, *msp
 // 获取客户端的aesKey和aesIV
 // dhServerPrivKey  服务端私钥
 func (u *Handler) getClientAesKeyAndIV(clientKey string, dhServerPrivKey [32]byte) ([]byte, []byte, error) {
-
 	clientKeyBytes, err := base64.StdEncoding.DecodeString(clientKey)
 	if err != nil {
 		return nil, nil, err

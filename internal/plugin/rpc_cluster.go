@@ -10,7 +10,6 @@ import (
 )
 
 func (a *rpc) clusterConfig(c *msrpc.Context) {
-
 	nodes := service.Cluster.Nodes()
 	slots := service.Cluster.Slots()
 
@@ -50,7 +49,6 @@ func (a *rpc) clusterConfig(c *msrpc.Context) {
 }
 
 func (a *rpc) clusterChannelBelongNode(c *msrpc.Context) {
-
 	req := &pluginproto.ClusterChannelBelongNodeReq{}
 	err := req.Unmarshal(c.Body())
 	if err != nil {

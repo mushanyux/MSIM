@@ -14,13 +14,11 @@ func NewHandler() *Handler {
 	h := &Handler{
 		Log: mslog.NewMSLog("handler"),
 	}
-
 	h.routes()
 	return h
 }
 
 func (h *Handler) routes() {
-
 	// 在线推送
 	eventbus.RegisterPusherHandlers(eventbus.EventPushOnline, h.pushOnline)
 	// 离线推送

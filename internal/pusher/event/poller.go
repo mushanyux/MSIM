@@ -29,7 +29,6 @@ type poller struct {
 }
 
 func newPoller(index int, eventPool *EventPool) *poller {
-
 	p := &poller{
 		stopper:   syncutil.NewStopper(),
 		index:     index,

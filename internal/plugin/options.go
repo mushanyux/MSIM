@@ -12,12 +12,11 @@ type Options struct {
 }
 
 func NewOptions(opt ...Option) *Options {
-
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
-	socketPath := path.Join(homeDir, ".wukong", "run", "wukongim.sock")
+	socketPath := path.Join(homeDir, ".mushan", "run", "mushanim.sock")
 
 	opts := &Options{
 		Dir:        "./plugindir",

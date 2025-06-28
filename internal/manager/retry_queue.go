@@ -31,7 +31,6 @@ type RetryQueue struct {
 
 // NewRetryQueue NewRetryQueue
 func NewRetryQueue(index int, r *RetryManager) *RetryQueue {
-
 	return &RetryQueue{
 		r:                r,
 		inFlightPQ:       newInFlightPqueue(4056),
@@ -46,7 +45,6 @@ func (r *RetryQueue) startInFlightTimeout(msg *types.RetryMessage) {
 	msg.Pri = now.Add(options.G.MessageRetry.Interval).UnixNano()
 	r.pushInFlightMessage(msg)
 	r.addToInFlightPQ(msg)
-
 }
 
 func (r *RetryQueue) addToInFlightPQ(msg *types.RetryMessage) {
@@ -65,7 +63,6 @@ func (r *RetryQueue) pushInFlightMessage(msg *types.RetryMessage) {
 		return
 	}
 	r.inFlightMessages[key] = msg
-
 }
 
 func (r *RetryQueue) popInFlightMessage(fromNodeId uint64, connId int64, messageId int64) (*types.RetryMessage, error) {
@@ -104,7 +101,6 @@ func (r *RetryQueue) finishMessage(fromNode uint64, connId int64, messageId int6
 		return err
 	}
 	r.removeFromInFlightPQ(msg)
-
 	return nil
 }
 func (r *RetryQueue) removeFromInFlightPQ(msg *types.RetryMessage) {
@@ -145,7 +141,6 @@ func (r *RetryQueue) inFlightMessagesCount() int {
 
 // Start 开始运行重试
 func (r *RetryQueue) Start() {
-
 	scanInterval := options.G.MessageRetry.ScanInterval
 
 	p := float64(fastrand.Uint32()) / (1 << 32)

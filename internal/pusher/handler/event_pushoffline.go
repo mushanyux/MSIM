@@ -8,7 +8,6 @@ import (
 
 func (h *Handler) pushOffline(ctx *eventbus.PushContext) {
 	for _, e := range ctx.Events {
-
 		for _, toUid := range e.OfflineUsers {
 			fromUid := e.Conn.Uid
 			// 是否是AI

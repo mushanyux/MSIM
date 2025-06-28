@@ -31,7 +31,6 @@ type MessageResp struct {
 }
 
 func (m *MessageResp) From(messageD msdb.Message, systemUid string) {
-
 	fromUid := messageD.FromUID
 
 	if fromUid == systemUid {
@@ -107,7 +106,6 @@ type StreamItemResp struct {
 }
 
 func NewStreamItemResp(m *msdb.Stream) *StreamItemResp {
-
 	return &StreamItemResp{
 		StreamId:    m.StreamId,
 		StreamIdStr: strconv.FormatUint(m.StreamId, 10),

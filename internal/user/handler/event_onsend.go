@@ -33,7 +33,6 @@ func (h *Handler) onSend(ctx *eventbus.UserContext) {
 }
 
 func (h *Handler) handleOnSend(event *eventbus.Event) {
-
 	// 记录消息路径
 	event.Track.Record(track.PositionUserOnSend)
 
@@ -110,7 +109,6 @@ func (h *Handler) handleOnSend(event *eventbus.Event) {
 	})
 	// 推进
 	eventbus.Channel.Advance(fakeChannelId, channelType)
-
 }
 
 func (h *Handler) pluginInvokeSend(sendPacket *msproto.SendPacket, event *eventbus.Event) (msproto.ReasonCode, error) {
@@ -161,7 +159,6 @@ func (h *Handler) pluginInvokeSend(sendPacket *msproto.SendPacket, event *eventb
 
 // decode payload
 func (h *Handler) decryptPayload(sendPacket *msproto.SendPacket, conn *eventbus.Conn) ([]byte, error) {
-
 	aesKey, aesIV := conn.AesKey, conn.AesIV
 	vail, err := h.sendPacketIsVail(sendPacket, conn)
 	if err != nil {

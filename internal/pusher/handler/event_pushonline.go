@@ -27,7 +27,6 @@ func (h *Handler) processChannelPush(events []*eventbus.Event) {
 		if options.G.IsSystemUid(e.ToUid) {
 			continue
 		}
-
 		fromUid := e.Conn.Uid
 		// 如果发送者是系统账号，则不显示发送者
 		if options.G.IsSystemUid(fromUid) {
@@ -199,7 +198,6 @@ func (h *Handler) processChannelPush(events []*eventbus.Event) {
 
 // 处理AI推送
 func (h *Handler) processAIPush(uid string, e *eventbus.Event) {
-
 	pluginNo, err := h.getAIPluginNo(uid)
 	if err != nil {
 		h.Error("获取AI插件编号失败！", zap.Error(err), zap.String("uid", uid))

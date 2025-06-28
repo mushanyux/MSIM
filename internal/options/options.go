@@ -337,7 +337,7 @@ func New(op ...Option) *Options {
 		TimingWheelTick:      time.Millisecond * 10,
 		TimingWheelSize:      100,
 		GinMode:              gin.ReleaseMode,
-		RootDir:              path.Join(homeDir, "wukongim"),
+		RootDir:              path.Join(homeDir, "mushanim"),
 		ManagerUID:           "____manager",
 		SystemUID:            "____system",
 		SystemDeviceId:       "____device",
@@ -554,7 +554,7 @@ func New(op ...Option) *Options {
 			ServiceHostName  string
 			PrometheusApiUrl string
 		}{
-			ServiceName:      "wukongim",
+			ServiceName:      "mushanim",
 			ServiceHostName:  "imnode",
 			PrometheusApiUrl: "",
 		},
@@ -664,8 +664,8 @@ func New(op ...Option) *Options {
 			Issuer string
 		}{
 			Expire: time.Hour * 24 * 30,
-			Secret: "secret_wukongim",
-			Issuer: "wukongim",
+			Secret: "secret_mushanim",
+			Issuer: "mushanim",
 		},
 		MigrateStartStep: MigrateStepMessage,
 		Tag: struct {
@@ -990,7 +990,7 @@ func (o *Options) ConfigureWithViper(vp *viper.Viper) {
 	o.Plugin.Timeout = o.getDuration("plugin.timeout", o.Plugin.Timeout)
 	o.Plugin.SocketPath = o.getString("plugin.socketPath", o.Plugin.SocketPath)
 	if strings.TrimSpace(o.Plugin.SocketPath) == "" {
-		o.Plugin.SocketPath = path.Join(homeDir, ".wukong", "run", "wukongim.sock")
+		o.Plugin.SocketPath = path.Join(homeDir, ".mushan", "run", "mushanim.sock")
 	}
 	installPlugins := o.getStringSlice("plugin.install")
 	if len(installPlugins) > 0 {

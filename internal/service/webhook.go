@@ -18,7 +18,6 @@ type IWebhook interface {
 	NotifyOfflineMsg(events []*eventbus.Event)
 	// TriggerEvent 触发事件
 	TriggerEvent(event *types.Event)
-
 	// AppendMessageOfNotifyQueue 追加消息到通知队列
 	AppendMessageOfNotifyQueue(messages []msdb.Message) error
 }
