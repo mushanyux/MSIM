@@ -1,4 +1,4 @@
-package mkserver
+package msserver
 
 import (
 	"context"

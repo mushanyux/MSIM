@@ -17,7 +17,6 @@ type Ingress struct {
 }
 
 func New() *Ingress {
-
 	return &Ingress{
 		Log: mslog.NewMSLog("Ingress"),
 	}

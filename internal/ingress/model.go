@@ -83,7 +83,6 @@ type AllowSendReq struct {
 }
 
 func (a *AllowSendReq) decode(data []byte) error {
-
 	dec := msproto.NewDecoder(data)
 	var err error
 	if a.From, err = dec.String(); err != nil {

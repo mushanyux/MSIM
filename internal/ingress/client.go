@@ -82,7 +82,6 @@ func (c *Client) AddTag(nodeId uint64, req *TagAddReq) error {
 
 // 个人聊天判断接受者是否允许发送消息
 func (c *Client) RequestAllowSendForPerson(toNodeId uint64, from, to string) (*proto.Response, error) {
-
 	req := &AllowSendReq{
 		From: from,
 		To:   to,
@@ -95,12 +94,10 @@ func (c *Client) RequestAllowSendForPerson(toNodeId uint64, from, to string) (*p
 }
 
 func (c *Client) RequestSubscribers(toNodeId uint64, channelId string, channelType uint8) ([]string, error) {
-
 	req := &ChannelReq{
 		ChannelId:   channelId,
 		ChannelType: channelType,
 	}
-
 	data, err := req.Encode()
 	if err != nil {
 		return nil, err
