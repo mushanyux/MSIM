@@ -25,7 +25,6 @@ type varz struct {
 }
 
 func newVarz(s *Server) *varz {
-
 	return &varz{
 		s:   s,
 		Log: mslog.NewMSLog("varz"),
@@ -76,7 +75,6 @@ func (v *varz) HandleVarz(c *mshttp.Context) {
 }
 
 func (v *varz) Settings(c *mshttp.Context) {
-
 	setting := &SystemSetting{}
 	setting.Logger.TraceOn = msutil.BoolToInt(options.G.Logger.TraceOn)
 	setting.Logger.LokiOn = msutil.BoolToInt(options.G.LokiOn())

@@ -34,6 +34,7 @@ require (
 	github.com/sasha-s/go-deadlock v0.3.5
 	github.com/sendgrid/rest v2.6.9+incompatible
 	github.com/spf13/cast v1.7.1
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	github.com/valyala/bytebufferpool v1.0.0
@@ -188,6 +189,7 @@ require (
 	github.com/hashicorp/serf v0.10.2 // indirect
 	github.com/heroku/x v0.4.3 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/influxdata/tdigest v0.0.2-0.20210216194612-fc98d27c9e8b // indirect
 	github.com/influxdata/telegraf v1.34.1 // indirect
 	github.com/jaegertracing/jaeger-idl v0.5.0 // indirect
