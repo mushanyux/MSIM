@@ -1,12 +1,20 @@
 package main
 
 import (
+	"embed"
+
 	"github.com/mushanyux/MSIM/cmd"
 	"github.com/mushanyux/MSIM/pkg/mslog"
 	"github.com/mushanyux/MSIM/version"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 )
+
+//go:embed web/dist
+var webFS embed.FS
+
+//go:embed demo
+var demoFS embed.FS
 
 // go ldflags
 var Version string    // version
@@ -19,6 +27,8 @@ func main() {
 	version.Commit = Commit
 	version.CommitDate = CommitDate
 	version.TreeState = TreeState
+	version.WebFs = webFS
+	version.DemoFs = demoFS
 
 	// logFile, err := os.OpenFile("./fatal.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0660)
 	// if err != nil {
