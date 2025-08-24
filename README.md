@@ -1,5 +1,24 @@
 # MSIM
 
+MSIM 的通讯层
+
+业务层：github.com/mushanyux/MSIMServer
+
+协议SDK：github.com/mushanyux/MSIMGoProto
+
+安卓SDK：github.com/mushanyux/MSIMAndroidSDK
+
+安卓app：github.com/mushanyux/MSIMAndroid
+
+特点：
+
+故障自动转移，去中心化设计，节点之间数据互备，支持集群快速自动扩容，代理节点机制
+
+技术栈：
+
+自定义协议， 分布式Raft（魔改pull模式），多组Raft（魔改pull模式），关系数据库底层原理，分布式数据库设计， Reactors设计
+
+
 ## internal
 
 `api` 提供http接口
